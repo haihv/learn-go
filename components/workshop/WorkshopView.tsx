@@ -1,6 +1,6 @@
 "use client";
 import dynamic from "next/dynamic";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { useCourseStore } from "@/store/course";
 import { runGoCode } from "@/lib/go-runner";
 import type { RunResult } from "@/lib/go-runner";
@@ -27,34 +27,49 @@ export default function WorkshopView({ module, onComplete }: Props) {
   const setWorkshopStep = useCourseStore((state) => state.setWorkshopStep);
   const saveStepSolution = useCourseStore((state) => state.saveStepSolution);
   const markComplete = useCourseStore((state) => state.markComplete);
+  // initialStep starts at 0 (store default) and updates to the persisted value
+  // after Zustand's async localStorage hydration.
   const initialStep = useCourseStore((state) => state.workshopSteps[module.slug] ?? 0);
-  // ?? {} must be outside the selector — returning a new {} inside the selector
-  // creates a different reference every render, causing an infinite loop.
+  // ?? {} outside the selector to avoid a new object reference every render.
   const savedSolutions = useCourseStore((state) => state.workshopSolutions[module.slug]) ?? {};
 
-  // initialStep === steps.length is the "all done" sentinel written when the
-  // last step passes validation, so progress is persisted even if the user
-  // navigates away before clicking "Finish Workshop".
+  // steps.length is the "all done" sentinel stored when the last step passes.
   const isAllDone = initialStep >= module.steps.length;
-  const resolvedStep = isAllDone ? module.steps.length - 1 : Math.min(initialStep, module.steps.length - 1);
+  const resolvedStep = isAllDone
+    ? module.steps.length - 1
+    : Math.min(initialStep, module.steps.length - 1);
 
-  const [currentStep, setCurrentStep] = useState<number>(resolvedStep);
-  const [completedSteps, setCompletedSteps] = useState<number[]>(
-    isAllDone
-      ? Array.from({ length: module.steps.length }, (_, i) => i)
-      : Array.from({ length: resolvedStep }, (_, i) => i)
-  );
-  const [code, setCode] = useState<string>(
+  // Derived from the store — always correct after Zustand hydrates, with no
+  // useState that could be stale from the pre-hydration render.
+  const completedSteps = useMemo(() => {
+    if (isAllDone) return Array.from({ length: module.steps.length }, (_, i) => i);
+    return Array.from({ length: initialStep }, (_, i) => i);
+  }, [initialStep, isAllDone, module.steps.length]);
+
+  const [currentStep, setCurrentStep] = useState(resolvedStep);
+  const [code, setCode] = useState(
     savedSolutions[resolvedStep] ?? module.steps[resolvedStep].starterCode
   );
   const [feedback, setFeedback] = useState<Feedback | null>(null);
-  const [hintVisible, setHintVisible] = useState<boolean>(false);
-  const [showCelebration, setShowCelebration] = useState<boolean>(false);
-  const [isChecking, setIsChecking] = useState<boolean>(false);
+  const [hintVisible, setHintVisible] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [isChecking, setIsChecking] = useState(false);
   const [runResult, setRunResult] = useState<RunResult | null>(null);
-  const [runCount, setRunCount] = useState<number>(0);
-  // Set when the current step's validation passes — shows the Next Step button
-  const [readyToAdvance, setReadyToAdvance] = useState<boolean>(false);
+  const [runCount, setRunCount] = useState(0);
+  const [readyToAdvance, setReadyToAdvance] = useState(false);
+
+  // Sync currentStep and code whenever initialStep changes. This handles
+  // both Zustand's async hydration (0 → stored value) and step advances.
+  useEffect(() => {
+    setCurrentStep(resolvedStep);
+    setCode(savedSolutions[resolvedStep] ?? module.steps[resolvedStep].starterCode);
+    setFeedback(null);
+    setReadyToAdvance(false);
+    setRunResult(null);
+  // resolvedStep is the only dep we need; other values are read from the
+  // current render's closure when the effect fires.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolvedStep]);
 
   const handleCheck = useCallback(async () => {
     if (isChecking) return;
@@ -82,10 +97,9 @@ export default function WorkshopView({ module, onComplete }: Props) {
       const alreadyDone = completedSteps.includes(currentStep);
       if (!alreadyDone) {
         setReadyToAdvance(true);
-        const isLastStep = currentStep === module.steps.length - 1;
-        if (isLastStep) {
-          // Persist immediately so progress survives navigation before "Finish" is clicked.
-          // steps.length is the "all done" sentinel; markComplete is idempotent.
+        if (currentStep === module.steps.length - 1) {
+          // Persist immediately — steps.length sentinel + markComplete so the
+          // sidebar ticks even if the user navigates away before "Finish".
           setWorkshopStep(module.slug, module.steps.length);
           markComplete(module.slug);
         }
@@ -93,18 +107,16 @@ export default function WorkshopView({ module, onComplete }: Props) {
     } else {
       setFeedback({ ok: false, message: "Not quite — check your code and try again." });
     }
-  }, [isChecking, code, currentStep, module, completedSteps, saveStepSolution]);
+  }, [isChecking, code, currentStep, module, completedSteps, saveStepSolution, setWorkshopStep, markComplete]);
 
   function handleAdvance() {
     const isLast = currentStep === module.steps.length - 1;
     if (isLast) {
-      setCompletedSteps((prev) => (prev.includes(currentStep) ? prev : [...prev, currentStep]));
       setShowCelebration(true);
       setTimeout(() => { onComplete(); }, 1000);
     } else {
       const nextStep = currentStep + 1;
-      setCompletedSteps((prev) => [...prev, currentStep]);
-      setWorkshopStep(module.slug, nextStep);
+      setWorkshopStep(module.slug, nextStep); // triggers completedSteps update via useMemo
       setCurrentStep(nextStep);
       setCode(savedSolutions[nextStep] ?? module.steps[nextStep].starterCode);
       setFeedback(null);
@@ -116,7 +128,6 @@ export default function WorkshopView({ module, onComplete }: Props) {
 
   function handleStepClick(step: number) {
     setCurrentStep(step);
-    // Load the user's saved solution if available, otherwise the starter code
     setCode(savedSolutions[step] ?? module.steps[step].starterCode);
     setFeedback(null);
     setHintVisible(false);
@@ -190,7 +201,6 @@ export default function WorkshopView({ module, onComplete }: Props) {
         />
       )}
 
-      {/* Hint is at the bottom so it doesn't obscure the workspace */}
       <div className="border-t border-navy-700 pt-4">
         <button
           className="text-go-yellow text-sm underline"
