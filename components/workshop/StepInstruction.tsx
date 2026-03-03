@@ -1,6 +1,8 @@
 "use client";
-import { useState } from "react";
+import dynamic from "next/dynamic";
 import type { WorkshopStep } from "@/lib/curriculum/types";
+
+const CodeBlock = dynamic(() => import("@/components/lesson/CodeBlock"), { ssr: false });
 
 type Props = {
   step: WorkshopStep;
@@ -20,8 +22,8 @@ export default function StepInstruction({ step, stepNumber, onShowHint, hintVisi
         {hintVisible ? "Hide Hint" : "Show Hint"}
       </button>
       {hintVisible && (
-        <div className="mt-3 bg-navy-900 rounded-lg p-4 border border-navy-600">
-          <pre className="font-mono text-sm text-slate-300 overflow-x-auto whitespace-pre">{step.hint}</pre>
+        <div className="mt-3">
+          <CodeBlock code={step.hint} />
         </div>
       )}
     </div>

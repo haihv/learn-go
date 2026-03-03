@@ -1,16 +1,17 @@
 "use client";
 import { useState } from "react";
 
+type Tab = "output" | "errors";
+
 type OutputPanelProps = {
   stdout: string;
   stderr: string;
   error: string | null;
+  defaultTab?: Tab;
 };
 
-type Tab = "output" | "errors";
-
-export default function OutputPanel({ stdout, stderr, error }: OutputPanelProps) {
-  const [activeTab, setActiveTab] = useState<Tab>("output");
+export default function OutputPanel({ stdout, stderr, error, defaultTab = "output" }: OutputPanelProps) {
+  const [activeTab, setActiveTab] = useState<Tab>(defaultTab);
 
   const errorsContent = [stderr, error].filter(Boolean).join("\n");
 
