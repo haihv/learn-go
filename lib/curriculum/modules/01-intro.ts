@@ -48,6 +48,36 @@ Running this with \`go run main.go\` prints:
 Hello, Go!
 \`\`\`
 
+## Exported Names
+
+In Go, whether an identifier is visible outside its package is determined entirely by its first letter — no \`public\` or \`private\` keywords needed.
+
+**The rule:** an identifier that starts with an **uppercase letter** is *exported* (accessible from other packages). One that starts with a **lowercase letter** is *unexported* (package-private).
+
+This is why \`fmt.Println\` is capitalized: \`Println\` is exported from the \`fmt\` package so that your code — living in a different package — can call it. If you try to call the hypothetical lowercase version \`fmt.println\`, the compiler rejects it immediately:
+
+\`\`\`go
+fmt.println("Hello") // compile error: cannot refer to unexported name fmt.println
+\`\`\`
+
+The rule applies uniformly to **functions, types, variables, constants, struct fields, and methods** — anything declared at package level follows the same capitalization convention.
+
+\`\`\`go
+package greeter
+
+// Exported — callable from other packages
+func Hello(name string) string {
+    return "Hello, " + name
+}
+
+// unexported — only usable within this package
+func format(s string) string {
+    return "[" + s + "]"
+}
+\`\`\`
+
+**Practical implication:** when you import a package, you can only reference its exported (uppercase) identifiers. Everything lowercase is the package's internal implementation detail — the compiler enforces this boundary so you never need to read the source to know what is part of the public API.
+
 ## fmt.Println
 
 \`fmt.Println\` writes its arguments to standard output followed by a newline. Multiple values are separated by spaces automatically:
@@ -148,8 +178,8 @@ Go was designed with one guiding principle: *simplicity scales*. A small languag
       correctIndex: 1,
     },
     {
-      question: "Which syntax correctly imports the fmt package?",
-      options: ['import { fmt }', 'import "fmt"', '#include <fmt>', 'using fmt;'],
+      question: "Which identifier can be used from outside its package?",
+      options: ["myFunc", "MyFunc", "_myFunc", "my_func"],
       correctIndex: 1,
     },
     {

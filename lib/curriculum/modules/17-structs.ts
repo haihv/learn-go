@@ -75,6 +75,65 @@ Use pointer receivers when:
 
 Go automatically takes the address of \`p\` when you call a pointer receiver method on an addressable value, so \`p.Birthday()\` works even though \`p\` is not declared as a pointer.
 
+## Methods on Any Named Type
+
+In Go, methods are not limited to structs. You can declare a method on **any named type defined in the same package**, including types based on primitives, slices, or maps.
+
+The only restriction is that the named type must be declared in the same package as the method — you cannot add methods to built-in types like \`int\` or \`string\` directly, because they are not yours to extend. You must first create a named alias:
+
+\`\`\`go
+// int is a built-in — you cannot write func (n int) Double() int
+// Instead, declare your own named type:
+type MyInt int
+
+func (m MyInt) Double() MyInt {
+    return m * 2
+}
+\`\`\`
+
+### Temperature types: type safety via named aliases
+
+A classic example from the Go standard library idiom is temperature conversion. Even though both types are backed by \`float64\`, the compiler treats \`Celsius\` and \`Fahrenheit\` as completely distinct types:
+
+\`\`\`go
+type Celsius float64
+type Fahrenheit float64
+
+func (c Celsius) ToFahrenheit() Fahrenheit {
+    return Fahrenheit(c*9/5 + 32)
+}
+
+func (f Fahrenheit) ToCelsius() Celsius {
+    return Celsius((f - 32) * 5 / 9)
+}
+
+func main() {
+    boiling := Celsius(100)
+    fmt.Printf("%.1f°C = %.1f°F\\n", boiling, boiling.ToFahrenheit())
+}
+\`\`\`
+
+Because \`Celsius\` and \`Fahrenheit\` are different types, the compiler will reject any attempt to add or compare them directly. This turns a common class of unit-mismatch bugs into a compile-time error — the same kind of safety you would otherwise need a dedicated struct for, with far less ceremony.
+
+### Named slice type with a method
+
+Methods on named slice types let you attach domain logic to a collection without wrapping it in a struct:
+
+\`\`\`go
+type StringSlice []string
+
+func (ss StringSlice) Contains(s string) bool {
+    for _, v := range ss {
+        if v == s {
+            return true
+        }
+    }
+    return false
+}
+\`\`\`
+
+This pattern is used in the standard library itself — for example, \`sort.StringSlice\` and \`sort.IntSlice\` are named slice types that implement \`sort.Interface\` through methods.
+
 ### Embedding (Composition over Inheritance)
 
 Go has no inheritance. Instead, you embed one struct inside another to reuse its fields and methods:
@@ -169,14 +228,14 @@ visits[Point{0, 0}]++
       correctIndex: 1,
     },
     {
-      question: "How does Go achieve code reuse similar to inheritance?",
+      question: "Which of these is a valid method declaration in Go?",
       options: [
-        "Using the extends keyword",
-        "Through class hierarchies",
-        "Through struct embedding (composition)",
-        "Using mixins",
+        "func (int).Double() int { return int * 2 }",
+        "type MyInt int; func (m MyInt) Double() MyInt { return m * 2 }",
+        "extend int { func Double() int { return this * 2 } }",
+        "int.prototype.Double = func() int { return this * 2 }",
       ],
-      correctIndex: 2,
+      correctIndex: 1,
     },
   ],
 };

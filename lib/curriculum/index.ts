@@ -1,4 +1,5 @@
 import { intro } from "./modules/01-intro";
+import { basicTypes } from "./modules/01b-basic-types";
 import { variables } from "./modules/02-variables";
 import { variablesLab } from "./modules/03-variables-lab";
 import { pointers } from "./modules/04-pointers";
@@ -10,6 +11,7 @@ import { closuresWorkshop } from "./modules/09-closures-workshop";
 import { functionsLab } from "./modules/10-functions-lab";
 import { controlFlow } from "./modules/11-control-flow";
 import { controlFlowWorkshop } from "./modules/12-control-flow-workshop";
+import { arrays } from "./modules/12b-arrays";
 import { slices } from "./modules/13-slices";
 import { slicesLab } from "./modules/14-slices-lab";
 import { maps } from "./modules/15-maps";
@@ -20,6 +22,7 @@ import { structsLab } from "./modules/19-structs-lab";
 import { interfaces } from "./modules/20-interfaces";
 import { interfacesWorkshop } from "./modules/21-interfaces-workshop";
 import { interfacesLab } from "./modules/22-interfaces-lab";
+import { ioReader } from "./modules/22b-io-reader";
 import { errorHandling } from "./modules/23-error-handling";
 import { errorHandlingWorkshop } from "./modules/24-error-handling-workshop";
 import { errorHandlingLab } from "./modules/25-error-handling-lab";
@@ -41,7 +44,7 @@ import type { CourseModule } from "./types";
 
 export const curriculum: CourseModule[] = [
   // Block 1: Foundations
-  intro, variables, variablesLab,
+  intro, basicTypes, variables, variablesLab,
   pointers, pointersWorkshop,
   // Block 2: Functions & Closures
   functions, functionsWorkshop,
@@ -49,11 +52,13 @@ export const curriculum: CourseModule[] = [
   functionsLab,
   // Block 3: Control Flow & Collections
   controlFlow, controlFlowWorkshop,
+  arrays,
   slices, slicesLab,
   maps, mapsLab,
   // Block 4: Type System
   structs, structsWorkshop, structsLab,
   interfaces, interfacesWorkshop, interfacesLab,
+  ioReader,
   // Block 5: Error Handling & Resilience
   errorHandling, errorHandlingWorkshop, errorHandlingLab,
   deferPanicRecover, deferPanicRecoverWorkshop,

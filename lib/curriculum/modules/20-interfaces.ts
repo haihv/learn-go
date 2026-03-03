@@ -65,33 +65,6 @@ func main() {
 
 Neither \`Circle\` nor \`Rectangle\` declares that it implements \`Shape\`. The compiler checks at the call site — if the method exists with the right signature, the type satisfies the interface.
 
-## fmt.Stringer
-
-The most widely used interface in Go is \`fmt.Stringer\`, defined in the \`fmt\` package:
-
-\`\`\`go
-type Stringer interface {
-    String() string
-}
-\`\`\`
-
-When you implement \`String() string\` on your type, \`fmt.Println\` and related functions automatically call it to format output:
-
-\`\`\`go
-type Point struct {
-    X, Y int
-}
-
-func (p Point) String() string {
-    return fmt.Sprintf("(%d, %d)", p.X, p.Y)
-}
-
-func main() {
-    p := Point{3, 4}
-    fmt.Println(p) // prints: (3, 4)
-}
-\`\`\`
-
 ## The Empty Interface: any
 
 The empty interface has no methods, so every type satisfies it. In Go 1.18+, \`any\` is an alias for \`interface{}\`:
@@ -140,6 +113,56 @@ default:
 \`\`\`
 
 Interfaces are the primary mechanism for polymorphism in Go — small, focused interface definitions lead to composable, testable code.
+
+## fmt.Stringer
+
+The most widely-used single-method interface in Go is \`fmt.Stringer\`, defined in the \`fmt\` package:
+
+\`\`\`go
+type Stringer interface {
+    String() string
+}
+\`\`\`
+
+When \`fmt.Println\`, \`fmt.Printf("%v", ...)\`, or \`fmt.Printf("%s", ...)\` receive a value, the \`fmt\` package checks at runtime whether the value's type implements \`Stringer\`. If it does, \`String()\` is called automatically to produce the output.
+
+### Implementing Stringer
+
+\`\`\`go
+package main
+
+import "fmt"
+
+type Point struct {
+    X, Y float64
+}
+
+// String is called automatically by fmt whenever it formats a Point.
+// Returning a human-readable string here avoids the default {X:3 Y:4} output.
+func (p Point) String() string {
+    return fmt.Sprintf("(%g, %g)", p.X, p.Y)
+}
+
+func main() {
+    p := Point{3, 4}
+    fmt.Println(p)        // prints: (3, 4) — calls p.String() automatically
+    fmt.Printf("%v\\n", p) // also calls p.String()
+    fmt.Printf("%s\\n", p) // also calls p.String()
+}
+\`\`\`
+
+### Why this is Go's interface system in action
+
+The \`fmt\` package was written *before* your \`Point\` type existed. Yet it can call your type's \`String()\` method — because Go checks for the method at the call site with no registration, no coupling, and no inheritance. Your type never imports or references \`fmt\` to satisfy \`Stringer\`; \`fmt\` simply checks whether the right method exists.
+
+### Other interfaces that work the same way
+
+The same pattern appears throughout the standard library:
+
+- **\`error\`** — \`Error() string\`: checked by \`fmt\` and every function that returns an error. Implement it on any type to make it usable as an error value.
+- **\`io.Reader\`** — \`Read([]byte) (int, error)\`: checked by anything that reads bytes — \`json.Decoder\`, \`http.Request.Body\`, \`io.Copy\`, and more. A type satisfying \`io.Reader\` works with all of them.
+
+These are all just interfaces. Go checks for them implicitly at compile time; nothing needs to be declared or registered.
 
 ## Interface Composition
 
@@ -201,14 +224,14 @@ The fix is to return a bare \`nil\` (untyped) directly rather than assigning a t
       correctIndex: 1,
     },
     {
-      question: "What does `any` represent in Go?",
+      question: "Which method must a type implement to customize how fmt.Println prints it?",
       options: [
-        "A nullable type",
-        "The empty interface — accepts any value",
-        "A generic type parameter",
-        "A union type",
+        "Print() string",
+        "Format() string",
+        "String() string",
+        "ToString() string",
       ],
-      correctIndex: 1,
+      correctIndex: 2,
     },
   ],
 };

@@ -287,5 +287,47 @@ func main() {
 			successMessage:
 				"Closing a channel broadcasts to every goroutine blocked on it simultaneously — this is the idiomatic Go pattern for a cancellation signal that fans out to many receivers.",
 		},
+		{
+			instruction:
+				"Write a `generate` function that sends the integers 1 through 5 on a channel and then closes it. In `main`, launch `generate` as a goroutine, then use `for range` to receive and print each value from the channel.",
+			starterCode: `package main
+
+import "fmt"
+
+// generate sends 1..5 on ch, then closes it to signal completion
+func generate(ch chan<- int) {
+	// TODO: send integers 1 through 5, then close the channel
+}
+
+func main() {
+	ch := make(chan int)
+	go generate(ch)
+	// TODO: use for range to receive and print each value
+}
+`,
+			hint: `package main
+
+import "fmt"
+
+func generate(ch chan<- int) {
+	for i := 1; i <= 5; i++ {
+		ch <- i
+	}
+	close(ch)
+}
+
+func main() {
+	ch := make(chan int)
+	go generate(ch)
+	for v := range ch {
+		fmt.Println(v)
+	}
+}
+`,
+			validate: (code: string) =>
+				code.includes("close(") && code.includes("range "),
+			successMessage:
+				"Closing a channel tells receivers no more values are coming — for range stops automatically when the channel is closed and drained.",
+		},
 	],
 };

@@ -123,5 +123,121 @@ func main() {
       successMessage:
         "range gives you both the index and value — use _ to discard either one.",
     },
+    {
+      instruction:
+        "Declare a nil slice with `var s []int` (no initializer). Print `s` and then print `s == nil` to see that an uninitialized slice is nil.",
+      hint: `package main
+
+import "fmt"
+
+func main() {
+	var s []int
+	fmt.Println(s, s == nil)
+}`,
+      starterCode: `package main
+
+import "fmt"
+
+func main() {
+	// var declaration without an initializer gives a nil slice
+	// A nil slice has length 0 and can still be appended to
+	fmt.Println()
+}`,
+      // check that the student used var declaration and referenced nil
+      validate: (code: string) =>
+        code.includes("var s") && code.includes("nil"),
+      successMessage:
+        "A nil slice is the zero value for slices — len 0, cap 0, and safe to append to.",
+    },
+    {
+      instruction:
+        "Use `make([]int, 5)` to create a pre-allocated slice of length 5 (all zeros). Print the slice and its length with `len()`.",
+      hint: `package main
+
+import "fmt"
+
+func main() {
+	s := make([]int, 5)
+	fmt.Println(s, len(s))
+}`,
+      starterCode: `package main
+
+import "fmt"
+
+func main() {
+	// make([]T, length) allocates a slice with all elements set to zero
+	// This avoids repeated re-allocation when you know the size upfront
+	s := make([]int, 5)
+	fmt.Println(s, len())
+}`,
+      // verify the student called make and len
+      validate: (code: string) =>
+        code.includes("make(") && code.includes("len("),
+      successMessage:
+        "make allocates the underlying array once — more efficient than building up with append.",
+    },
+    {
+      instruction:
+        "Create `s := make([]int, 3, 10)`. Print `len(s)` and `cap(s)`. Then append three more values and print the new `len(s)` and `cap(s)`. Notice cap doesn't change because the appends fit within the existing capacity.",
+      hint: `package main
+
+import "fmt"
+
+func main() {
+	s := make([]int, 3, 10)
+	fmt.Println("len:", len(s), "cap:", cap(s))
+	s = append(s, 1, 2, 3)
+	fmt.Println("len:", len(s), "cap:", cap(s))
+}`,
+      starterCode: `package main
+
+import "fmt"
+
+func main() {
+	// make([]T, length, capacity) — capacity sets the underlying array size
+	// append reuses the backing array as long as len stays within cap
+	s := make([]int, 3, 10)
+	fmt.Println("len:", len(s), "cap:", cap(s))
+	// append three more elements, then print len and cap again
+}`,
+      // ensure both cap and len are present; the student must compare them
+      validate: (code: string) =>
+        code.includes("cap(") && code.includes("len("),
+      successMessage:
+        "len is how many elements you have; cap is how many fit before a new backing array is needed.",
+    },
+    {
+      instruction:
+        "Create `orig := []int{1, 2, 3, 4, 5}`, then `view := orig[1:3]`. Set `view[0] = 99` and print both `view` and `orig`. Notice that `orig[1]` also changed — slices share the backing array.",
+      hint: `package main
+
+import "fmt"
+
+func main() {
+	orig := []int{1, 2, 3, 4, 5}
+	view := orig[1:3]
+	view[0] = 99
+	fmt.Println("view:", view)
+	fmt.Println("orig:", orig)
+}`,
+      starterCode: `package main
+
+import "fmt"
+
+func main() {
+	orig := []int{1, 2, 3, 4, 5}
+	// Slicing creates a view, not a copy — both slices point at the same memory
+	view := orig[1:3]
+	// Mutate through view and observe the effect on orig
+	fmt.Println("view:", view)
+	fmt.Println("orig:", orig)
+}`,
+      // the student must slice orig and write through view
+      validate: (code: string) =>
+        (code.includes("orig[1:") || code.includes("orig[1 :")) &&
+        code.includes("view[0]"),
+      successMessage:
+        "Slices are views — mutations through one slice affect every slice sharing the same backing array.",
+    },
   ],
 };

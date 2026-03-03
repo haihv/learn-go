@@ -185,6 +185,66 @@ func main() {
 \`\`\`
 
 Go automatically takes the address of \`c\` when you call a pointer receiver method on an addressable value, so \`c.Increment()\` compiles and works even though \`c\` is not declared as a \`*Counter\`. You will explore this fully in the Structs module.
+
+## Pointer Indirection in Method Calls
+
+Go quietly bridges the gap between value and pointer receivers at call sites. When you call a pointer-receiver method on an addressable value variable, Go rewrites the call as \`(&v).Method()\` for you. The reverse also applies: a value-receiver method called on a pointer is rewritten as \`(*p).Method()\`.
+
+\`\`\`go
+type Counter struct{ n int }
+
+func (c *Counter) Inc() { c.n++ }          // pointer receiver — mutates
+func (c Counter) Value() int { return c.n } // value receiver — reads copy
+
+func main() {
+    c := Counter{}
+    c.Inc()               // Go rewrites as (&c).Inc() — c is addressable
+    fmt.Println(c.Value()) // 1
+
+    p := &Counter{}
+    p.Inc()               // normal pointer-receiver call
+    fmt.Println(p.Value()) // Go rewrites as (*p).Value() — 1
+}
+\`\`\`
+
+**The addressability constraint** is the key limit: Go can only auto-take the address of a variable, not of an expression that produces a temporary value. A composite literal used directly as a call target is not addressable, so \`Counter{}.Inc()\` is a compile error — there is no variable whose address Go can use.
+
+The practical takeaway: declare your receiver as a variable (\`c := Counter{}\`) and Go handles the \`&\` and \`*\` mechanics transparently.
+
+## Choosing a Value or Pointer Receiver
+
+The Tour of Go gives clear guidance on which receiver type to choose. The decision affects correctness, performance, and interface satisfaction.
+
+### Use a pointer receiver when:
+
+- **The method must modify the receiver.** A value receiver gets a copy; mutations are discarded when the method returns.
+- **The struct is large.** Copying a large struct on every call wastes CPU and stack space; a pointer costs only 8 bytes.
+- **Consistency.** If any method on a type uses a pointer receiver, all methods should — mixing creates confusion about which calls mutate the original and which do not, and it breaks interface satisfaction in subtle ways.
+
+### Use a value receiver when:
+
+- **The method only reads the receiver** and the type is small enough that copying is cheap.
+- **You want call-site immutability** — callers pass a value and the method cannot affect their copy.
+- **The type is a primitive alias** (e.g., \`type Celsius float64\`) where pointer overhead is not justified.
+
+### The consistency rule in practice
+
+\`\`\`go
+type Account struct {
+    owner   string
+    balance float64
+}
+
+// All methods use pointer receivers for consistency, even though
+// Owner() does not mutate — mixing would force callers to track which
+// methods need a pointer and which do not.
+func (a *Account) Deposit(amount float64) { a.balance += amount }
+func (a *Account) Withdraw(amount float64) { a.balance -= amount }
+func (a *Account) Balance() float64        { return a.balance }
+func (a *Account) Owner() string           { return a.owner }
+\`\`\`
+
+When a type satisfies an interface, Go requires that the method set matches. A pointer receiver method is only in the method set of \`*T\`, not \`T\` — so keeping all methods on pointer receivers avoids the common mistake of passing a value where a pointer is needed to satisfy an interface.
 `,
   quiz: [
     {
@@ -203,9 +263,14 @@ Go automatically takes the address of \`c\` when you call a pointer receiver met
       correctIndex: 0,
     },
     {
-      question: "What is the zero value of a pointer type?",
-      options: ["0", "false", "nil", "{}"],
-      correctIndex: 2,
+      question: "You have `var c Counter` and `func (c *Counter) Inc()`. How do you call Inc?",
+      options: [
+        "Must use: (&c).Inc()",
+        "c.Inc() — Go auto-takes the address of an addressable variable",
+        "Cannot call pointer-receiver methods on a value",
+        "*c.Inc()",
+      ],
+      correctIndex: 1,
     },
   ],
 };

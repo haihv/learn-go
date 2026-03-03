@@ -104,6 +104,92 @@ func main() {
 
 If multiple cases are ready simultaneously, Go picks one at random. The \`default\` case runs immediately if no channel is ready, avoiding a block.
 
+### The Default Case in select
+
+A \`default\` case makes channel operations non-blocking — instead of waiting for a channel, Go immediately takes the \`default\` branch when no case is ready.
+
+**Try-receive pattern** — check if a value is available without blocking:
+
+\`\`\`go
+select {
+case msg := <-ch:
+    fmt.Println("received:", msg)
+default:
+    fmt.Println("no message ready")
+}
+\`\`\`
+
+**Try-send pattern** — drop a value rather than block when the channel is full:
+
+\`\`\`go
+select {
+case ch <- value:
+    fmt.Println("sent")
+default:
+    fmt.Println("channel full, dropping")
+}
+\`\`\`
+
+**Polling loop** — \`default\` combined with \`time.Sleep\` lets a goroutine periodically check a channel without ever blocking on it:
+
+\`\`\`go
+for {
+    select {
+    case result := <-done:
+        fmt.Println("done:", result)
+        return
+    default:
+        fmt.Println("still working...")
+        time.Sleep(100 * time.Millisecond)
+    }
+}
+\`\`\`
+
+Typical use cases: rate limiting, circuit breakers, and checking whether a goroutine has finished without stalling the caller.
+
+## Range and Close
+
+### Closing a channel
+
+\`close(ch)\` signals to receivers that no more values will be sent. Only the **sender** should close a channel — closing a nil channel or closing one that is already closed will panic.
+
+### The comma-ok idiom
+
+A receive expression returns a second boolean that tells you whether the channel is still open:
+
+\`\`\`go
+v, ok := <-ch
+// ok is false when the channel is closed and all buffered values have been drained
+\`\`\`
+
+### for range over a channel
+
+\`for range\` handles the comma-ok check internally and stops the loop automatically when the channel is closed and empty:
+
+\`\`\`go
+func producer(ch chan<- int) {
+    for i := 0; i < 5; i++ {
+        ch <- i
+    }
+    close(ch)  // signal: no more values
+}
+
+func main() {
+    ch := make(chan int)
+    go producer(ch)
+    for v := range ch {   // loops until ch is closed
+        fmt.Println(v)
+    }
+}
+\`\`\`
+
+This is the standard producer/consumer pattern: the producer goroutine closes the channel when it is done; the consumer uses \`for range\` rather than counting expected values.
+
+**Rules to avoid panics:**
+- Never close a channel from the receiver side
+- Never close a channel more than once
+- If multiple goroutines may send, coordinate closure with a \`sync.WaitGroup\` and a dedicated closer goroutine
+
 ### \`sync.WaitGroup\`
 
 \`time.Sleep\` is a poor way to wait for goroutines. The idiomatic solution is \`sync.WaitGroup\`:
@@ -244,14 +330,14 @@ To prevent leaks: always ensure goroutines have a way to exit — use a \`done\`
       correctIndex: 1,
     },
     {
-      question: "Which WaitGroup methods are used to track goroutines?",
+      question: "What happens when a select statement has a default case and no channel is ready?",
       options: [
-        "Start, Stop, Finish",
-        "Add, Done, Wait",
-        "Begin, End, Join",
-        "Fork, Join, Sync",
+        "It blocks until a channel becomes ready",
+        "It panics with a deadlock error",
+        "The default case executes immediately",
+        "It skips the entire select block",
       ],
-      correctIndex: 1,
+      correctIndex: 2,
     },
   ],
 };
