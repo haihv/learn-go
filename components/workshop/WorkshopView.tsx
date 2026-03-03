@@ -26,18 +26,26 @@ type Feedback = {
 export default function WorkshopView({ module, onComplete }: Props) {
   const setWorkshopStep = useCourseStore((state) => state.setWorkshopStep);
   const saveStepSolution = useCourseStore((state) => state.saveStepSolution);
+  const markComplete = useCourseStore((state) => state.markComplete);
   const initialStep = useCourseStore((state) => state.workshopSteps[module.slug] ?? 0);
   // ?? {} must be outside the selector — returning a new {} inside the selector
   // creates a different reference every render, causing an infinite loop.
   const savedSolutions = useCourseStore((state) => state.workshopSolutions[module.slug]) ?? {};
 
-  const safeInitialStep = Math.min(initialStep, module.steps.length - 1);
-  const [currentStep, setCurrentStep] = useState<number>(safeInitialStep);
+  // initialStep === steps.length is the "all done" sentinel written when the
+  // last step passes validation, so progress is persisted even if the user
+  // navigates away before clicking "Finish Workshop".
+  const isAllDone = initialStep >= module.steps.length;
+  const resolvedStep = isAllDone ? module.steps.length - 1 : Math.min(initialStep, module.steps.length - 1);
+
+  const [currentStep, setCurrentStep] = useState<number>(resolvedStep);
   const [completedSteps, setCompletedSteps] = useState<number[]>(
-    Array.from({ length: safeInitialStep }, (_, i) => i)
+    isAllDone
+      ? Array.from({ length: module.steps.length }, (_, i) => i)
+      : Array.from({ length: resolvedStep }, (_, i) => i)
   );
   const [code, setCode] = useState<string>(
-    savedSolutions[safeInitialStep] ?? module.steps[safeInitialStep].starterCode
+    savedSolutions[resolvedStep] ?? module.steps[resolvedStep].starterCode
   );
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [hintVisible, setHintVisible] = useState<boolean>(false);
@@ -69,12 +77,19 @@ export default function WorkshopView({ module, onComplete }: Props) {
     setIsChecking(false);
 
     if (passed) {
-      // Save the passing code as the user's solution for this step
       saveStepSolution(module.slug, currentStep, code);
       setFeedback({ ok: true, message: step.successMessage });
-      // Only offer to advance if this step wasn't already completed before
       const alreadyDone = completedSteps.includes(currentStep);
-      if (!alreadyDone) setReadyToAdvance(true);
+      if (!alreadyDone) {
+        setReadyToAdvance(true);
+        const isLastStep = currentStep === module.steps.length - 1;
+        if (isLastStep) {
+          // Persist immediately so progress survives navigation before "Finish" is clicked.
+          // steps.length is the "all done" sentinel; markComplete is idempotent.
+          setWorkshopStep(module.slug, module.steps.length);
+          markComplete(module.slug);
+        }
+      }
     } else {
       setFeedback({ ok: false, message: "Not quite — check your code and try again." });
     }
@@ -83,6 +98,7 @@ export default function WorkshopView({ module, onComplete }: Props) {
   function handleAdvance() {
     const isLast = currentStep === module.steps.length - 1;
     if (isLast) {
+      setCompletedSteps((prev) => (prev.includes(currentStep) ? prev : [...prev, currentStep]));
       setShowCelebration(true);
       setTimeout(() => { onComplete(); }, 1000);
     } else {
