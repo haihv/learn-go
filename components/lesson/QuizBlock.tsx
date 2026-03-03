@@ -80,7 +80,7 @@ export default function QuizBlock({ questions, onComplete }: Props) {
               onClick={onComplete}
               className="rounded-lg px-5 py-2 font-semibold bg-go-cyan text-navy-950 cursor-pointer"
             >
-              Continue →
+              Next →
             </button>
           ) : (
             <button

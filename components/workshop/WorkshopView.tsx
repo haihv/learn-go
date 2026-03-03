@@ -163,7 +163,7 @@ export default function WorkshopView({ module, onComplete }: Props) {
             className="bg-go-cyan text-navy-950 font-bold px-4 py-2 rounded-lg"
             onClick={handleAdvance}
           >
-            {isLastStep ? "Finish Workshop 🎉" : "Next Step →"}
+            {isLastStep ? "Finish →" : "Next →"}
           </button>
         ) : (
           <button
@@ -171,7 +171,7 @@ export default function WorkshopView({ module, onComplete }: Props) {
             onClick={handleCheck}
             disabled={isChecking}
           >
-            {isChecking ? "Running…" : "Check Code"}
+            {isChecking ? "Running…" : "▶ Run & Check"}
           </button>
         )}
         {!readyToAdvance && (
