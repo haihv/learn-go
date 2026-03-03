@@ -1,3 +1,123 @@
-// Stub — replaced in Phase 2
-import type { CourseModule } from "../types";
-export const intro: CourseModule = {} as CourseModule;
+import type { LessonModule } from "../types";
+
+export const intro: LessonModule = {
+  type: "lesson",
+  id: "01",
+  slug: "intro",
+  title: "Introduction to Go",
+  icon: "🐹",
+  estimatedMinutes: 10,
+  content: `# Introduction to Go
+
+## What Makes Go Special
+
+Go (also called Golang) is a compiled, statically typed language created at Google in 2009. Unlike Python or JavaScript — which are interpreted at runtime — Go compiles directly to machine code, making programs start fast and run efficiently.
+
+Here is a quick comparison:
+
+| Feature | Go | Python | JavaScript |
+|---|---|---|---|
+| Typing | Static | Dynamic | Dynamic |
+| Execution | Compiled | Interpreted | JIT/Interpreted |
+| Concurrency | Built-in (goroutines) | Threads/asyncio | Event loop / Workers |
+| Memory | Garbage collected | Garbage collected | Garbage collected |
+
+Go's syntax is intentionally small. There are no classes, no inheritance, and no operator overloading. What you get instead is a lean set of features that are easy to read and reason about — something Python aims for but Go enforces through tooling and language design.
+
+## Anatomy of a Go File
+
+Every Go source file begins with a **package declaration**. For a program you can run directly, the package must be named \`main\`:
+
+\`\`\`go
+package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("Hello, Go!")
+}
+\`\`\`
+
+- \`package main\` — tells the compiler this file belongs to the executable package.
+- \`import "fmt"\` — brings in the standard-library package for formatted I/O.
+- \`func main()\` — the entry point; execution starts here, just like \`main\` in C or Java.
+
+Running this with \`go run main.go\` prints:
+
+\`\`\`
+Hello, Go!
+\`\`\`
+
+## fmt.Println
+
+\`fmt.Println\` writes its arguments to standard output followed by a newline. Multiple values are separated by spaces automatically:
+
+\`\`\`go
+fmt.Println("Go version:", 1.22)
+// Output: Go version: 1.22
+\`\`\`
+
+Unlike \`console.log\` in JavaScript or \`print\` in Python, \`Println\` always appends a newline — no trailing \`\\n\` needed.
+
+## fmt.Printf and Format Verbs
+
+\`fmt.Printf\` gives you C-style format strings but with Go's own verbs:
+
+| Verb | Meaning |
+|---|---|
+| \`%s\` | String |
+| \`%d\` | Integer (decimal) |
+| \`%f\` | Floating-point |
+| \`%v\` | Default format for any value |
+| \`%T\` | Type of the value |
+
+\`\`\`go
+package main
+
+import "fmt"
+
+func main() {
+    name := "Gopher"
+    age := 15
+    score := 98.6
+
+    fmt.Printf("Name: %s\\n", name)
+    fmt.Printf("Age: %d\\n", age)
+    fmt.Printf("Score: %.1f\\n", score)
+    fmt.Printf("Value: %v, Type: %T\\n", age, age)
+}
+\`\`\`
+
+Output:
+
+\`\`\`
+Name: Gopher
+Age: 15
+Score: 98.6
+Value: 15, Type: int
+\`\`\`
+
+\`%v\` is the all-purpose verb — reach for it when you just want to see a value without caring about exact formatting. \`%T\` is especially useful while learning because it reveals what type Go inferred.
+
+## Go's Philosophy of Simplicity
+
+Go was designed with one guiding principle: *simplicity scales*. A small language means faster onboarding for new team members, consistent code style across large codebases, and fewer surprises at 2 am when something breaks in production. The standard library covers most everyday needs — HTTP servers, JSON encoding, cryptography — without pulling in third-party packages. As you work through this course, you will see that most Go code looks the same whether it was written by a beginner or a ten-year veteran. That consistency is the point.
+`,
+  quiz: [
+    {
+      question: "What must every executable Go program's package be named?",
+      options: ["library", "main", "program", "go"],
+      correctIndex: 1,
+    },
+    {
+      question: "Which syntax correctly imports the fmt package?",
+      options: ['import { fmt }', 'import "fmt"', '#include <fmt>', 'using fmt;'],
+      correctIndex: 1,
+    },
+    {
+      question: "What is the entry point function of a Go program?",
+      options: ["init()", "start()", "main()", "run()"],
+      correctIndex: 2,
+    },
+  ],
+};
