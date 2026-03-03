@@ -27,7 +27,9 @@ export default function WorkshopView({ module, onComplete }: Props) {
   const setWorkshopStep = useCourseStore((state) => state.setWorkshopStep);
   const saveStepSolution = useCourseStore((state) => state.saveStepSolution);
   const initialStep = useCourseStore((state) => state.workshopSteps[module.slug] ?? 0);
-  const savedSolutions = useCourseStore((state) => state.workshopSolutions[module.slug] ?? {});
+  // ?? {} must be outside the selector — returning a new {} inside the selector
+  // creates a different reference every render, causing an infinite loop.
+  const savedSolutions = useCourseStore((state) => state.workshopSolutions[module.slug]) ?? {};
 
   const safeInitialStep = Math.min(initialStep, module.steps.length - 1);
   const [currentStep, setCurrentStep] = useState<number>(safeInitialStep);
