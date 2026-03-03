@@ -1,4 +1,55 @@
-// Stub — replaced in Phase 3 (Subagent 3-A)
-export default function OutputPanel() {
-  return null;
+"use client";
+import { useState } from "react";
+
+type OutputPanelProps = {
+  stdout: string;
+  stderr: string;
+  error: string | null;
+};
+
+type Tab = "output" | "errors";
+
+export default function OutputPanel({ stdout, stderr, error }: OutputPanelProps) {
+  const [activeTab, setActiveTab] = useState<Tab>("output");
+
+  const errorsContent = [stderr, error].filter(Boolean).join("\n");
+
+  return (
+    <div>
+      <div className="flex border-b border-navy-600 mb-2">
+        <button
+          onClick={() => setActiveTab("output")}
+          className={`px-4 py-2 text-sm font-medium ${activeTab === "output" ? "border-b-2 border-go-cyan text-go-cyan" : "text-navy-500"}`}
+        >
+          Output
+        </button>
+        <button
+          onClick={() => setActiveTab("errors")}
+          className={`px-4 py-2 text-sm font-medium ${activeTab === "errors" ? "border-b-2 border-go-cyan text-go-cyan" : "text-navy-500"}`}
+        >
+          Errors
+        </button>
+      </div>
+
+      {activeTab === "output" && (
+        <pre className="bg-navy-800 p-4 rounded-lg font-mono text-sm overflow-x-auto min-h-[100px]">
+          {stdout ? (
+            <span className="text-go-green">{stdout}</span>
+          ) : (
+            <span className="text-navy-500">No output yet</span>
+          )}
+        </pre>
+      )}
+
+      {activeTab === "errors" && (
+        <pre className="bg-navy-800 p-4 rounded-lg font-mono text-sm overflow-x-auto min-h-[100px]">
+          {errorsContent ? (
+            <span className="text-go-red">{errorsContent}</span>
+          ) : (
+            <span className="text-navy-500">No errors</span>
+          )}
+        </pre>
+      )}
+    </div>
+  );
 }
