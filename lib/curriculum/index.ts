@@ -40,6 +40,20 @@ import { genericsWorkshop } from "./modules/36-generics-workshop";
 import { httpBasics } from "./modules/37-http-basics";
 import { httpWorkshop } from "./modules/38-http-workshop";
 import { httpLab } from "./modules/39-http-lab";
+import { testing } from "./modules/40-testing";
+import { testingWorkshop } from "./modules/41-testing-workshop";
+import { testingLab } from "./modules/42-testing-lab";
+import { contextModule } from "./modules/43-context";
+import { contextWorkshop } from "./modules/44-context-workshop";
+import { fileIO } from "./modules/45-file-io";
+import { fileIOWorkshop } from "./modules/46-file-io-workshop";
+import { fileIOLab } from "./modules/47-file-io-lab";
+import { timeSync } from "./modules/48-time-sync";
+import { timeSyncWorkshop } from "./modules/49-time-sync-workshop";
+import { concurrencyPatterns } from "./modules/50-concurrency-patterns";
+import { concurrencyPatternsWorkshop } from "./modules/51-concurrency-patterns-workshop";
+import { slog } from "./modules/52-slog";
+import { slogWorkshop } from "./modules/53-slog-workshop";
 import type { CourseModule } from "./types";
 
 export const curriculum: CourseModule[] = [
@@ -70,6 +84,18 @@ export const curriculum: CourseModule[] = [
   generics, genericsWorkshop,
   // Block 8: HTTP
   httpBasics, httpWorkshop, httpLab,
+  // Block 9: Testing
+  testing, testingWorkshop, testingLab,
+  // Block 10: context
+  contextModule, contextWorkshop,
+  // Block 11: File I/O
+  fileIO, fileIOWorkshop, fileIOLab,
+  // Block 12: time + sync
+  timeSync, timeSyncWorkshop,
+  // Block 13: Concurrency patterns
+  concurrencyPatterns, concurrencyPatternsWorkshop,
+  // Block 14: Structured logging
+  slog, slogWorkshop,
 ];
 
 export function getModuleBySlug(slug: string): CourseModule | undefined {
