@@ -1,15 +1,14 @@
 "use client";
 import dynamic from "next/dynamic";
 import { useState } from "react";
-import { useGoRunner } from "@/hooks/useGoRunner";
-import { runLabTests, allPassed } from "@/lib/test-runner";
 import { runGoCode } from "@/lib/go-runner";
+import type { RunResult } from "@/lib/go-runner";
+import { runLabTests, allPassed } from "@/lib/test-runner";
 import LabInstructions from "@/components/lab/LabInstructions";
 import TestResults from "@/components/lab/TestResults";
 import OutputPanel from "@/components/editor/OutputPanel";
-import RunButton from "@/components/editor/RunButton";
-import { triggerCelebration } from "@/components/ui/Celebration";
 import CelebrationOverlay from "@/components/ui/Celebration";
+import { triggerCelebration } from "@/components/ui/Celebration";
 import type { LabModule } from "@/lib/curriculum/types";
 import type { TestResult } from "@/lib/test-runner";
 
@@ -19,28 +18,90 @@ type Props = { module: LabModule; onComplete: () => void };
 
 export default function LabView({ module, onComplete }: Props) {
   const [code, setCode] = useState(module.starterCode);
+  const [isRunning, setIsRunning] = useState(false);
+  const [runResult, setRunResult] = useState<RunResult | null>(null);
+  const [runCount, setRunCount] = useState(0);
   const [testResults, setTestResults] = useState<TestResult[]>([]);
+  const [passed, setPassed] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
-  const { run, result, isRunning } = useGoRunner();
-
   const [mobileOpen, setMobileOpen] = useState(false);
 
   async function handleRun() {
-    await run(code);
+    if (isRunning) return;
+    setIsRunning(true);
+    setPassed(false);
+
+    const result = await runGoCode(code);
+    setRunResult(result);
+    setRunCount((c) => c + 1);
+
+    if (!result.stderr && !result.error) {
+      const results = runLabTests(module.tests, code, result.stdout ?? "");
+      setTestResults(results);
+      if (allPassed(results)) {
+        setPassed(true);
+        triggerCelebration();
+        setShowCelebration(true);
+      }
+    } else {
+      setTestResults([]);
+    }
+
+    setIsRunning(false);
   }
 
-  async function handleSubmit() {
-    const freshResult = await runGoCode(code);
-    const results = runLabTests(module.tests, code, freshResult.stdout ?? "");
-    setTestResults(results);
-    if (allPassed(results)) {
-      triggerCelebration();
-      setShowCelebration(true);
-      setTimeout(() => {
-        onComplete();
-      }, 1000);
-    }
+  function handleNext() {
+    setTimeout(() => onComplete(), 200);
   }
+
+  const editorSection = (
+    <div className="flex flex-col gap-4 p-4 flex-1 overflow-y-auto">
+      <GoEditor
+        value={code}
+        onChange={setCode}
+        onCmdEnter={passed ? handleNext : handleRun}
+      />
+      <div className="flex items-center gap-4">
+        {passed ? (
+          <button
+            onClick={handleNext}
+            className="bg-go-cyan text-navy-950 font-bold px-4 py-2 rounded-lg"
+          >
+            Next →
+          </button>
+        ) : (
+          <button
+            onClick={handleRun}
+            disabled={isRunning}
+            className={`bg-go-cyan text-navy-950 font-bold px-4 py-2 rounded-lg flex items-center gap-2 ${isRunning ? "opacity-50 cursor-not-allowed" : ""}`}
+          >
+            {isRunning ? (
+              <>
+                <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Running…
+              </>
+            ) : "▶ Run & Check"}
+          </button>
+        )}
+        {!passed && (
+          <span className="text-navy-500 text-xs">⌘ Enter (Mac) · Ctrl+Enter (Win/Linux)</span>
+        )}
+      </div>
+      {runResult && (
+        <OutputPanel
+          key={runCount}
+          stdout={runResult.stdout}
+          stderr={runResult.stderr}
+          error={runResult.error}
+          defaultTab={runResult.stderr || runResult.error ? "errors" : "output"}
+        />
+      )}
+      {testResults.length > 0 && <TestResults results={testResults} />}
+    </div>
+  );
 
   return (
     <>
@@ -48,23 +109,8 @@ export default function LabView({ module, onComplete }: Props) {
         <div className="w-[40%] border-r border-navy-600 overflow-y-auto">
           <LabInstructions instructions={module.instructions} />
         </div>
-        <div className="w-[60%] flex flex-col gap-4 p-4">
-          <GoEditor value={code} onChange={setCode} onCmdEnter={handleRun} />
-          <div className="flex flex-row gap-2">
-            <RunButton onRun={handleRun} isRunning={isRunning} />
-            <button
-              onClick={handleSubmit}
-              className="bg-navy-700 border border-go-cyan text-go-cyan px-4 py-2 rounded-lg font-bold"
-            >
-              Submit
-            </button>
-          </div>
-          <OutputPanel
-            stdout={result?.stdout ?? ""}
-            stderr={result?.stderr ?? ""}
-            error={result?.error ?? null}
-          />
-          <TestResults results={testResults} />
+        <div className="w-[60%] flex flex-col h-full">
+          {editorSection}
         </div>
       </div>
 
@@ -82,24 +128,7 @@ export default function LabView({ module, onComplete }: Props) {
             </div>
           )}
         </div>
-        <div className="flex flex-col gap-4 p-4 flex-1 overflow-y-auto">
-          <GoEditor value={code} onChange={setCode} onCmdEnter={handleRun} />
-          <div className="flex flex-row gap-2">
-            <RunButton onRun={handleRun} isRunning={isRunning} />
-            <button
-              onClick={handleSubmit}
-              className="bg-navy-700 border border-go-cyan text-go-cyan px-4 py-2 rounded-lg font-bold"
-            >
-              Submit
-            </button>
-          </div>
-          <OutputPanel
-            stdout={result?.stdout ?? ""}
-            stderr={result?.stderr ?? ""}
-            error={result?.error ?? null}
-          />
-          <TestResults results={testResults} />
-        </div>
+        {editorSection}
       </div>
 
       {showCelebration && <CelebrationOverlay />}
