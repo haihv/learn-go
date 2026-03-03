@@ -2,7 +2,7 @@ import type { LessonModule } from "../types";
 
 export const stringsRunes: LessonModule = {
 	type: "lesson",
-	id: "26",
+	id: "28",
 	slug: "strings-runes",
 	title: "Strings & Runes",
 	icon: "📝",

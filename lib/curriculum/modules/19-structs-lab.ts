@@ -2,7 +2,7 @@ import type { LabModule } from "../types";
 
 export const structsLab: LabModule = {
   type: "lab",
-  id: "18",
+  id: "19",
   slug: "structs-lab",
   title: "Task Manager Lab",
   icon: "✅",

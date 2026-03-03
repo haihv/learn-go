@@ -2,7 +2,7 @@ import type { LessonModule } from "../types";
 
 export const jsonEncoding: LessonModule = {
 	type: "lesson",
-	id: "27",
+	id: "30",
 	slug: "json-encoding",
 	title: "JSON Encoding",
 	icon: "📋",

@@ -2,7 +2,7 @@ import type { WorkshopModule } from "../types";
 
 export const errorHandlingWorkshop: WorkshopModule = {
 	type: "workshop",
-	id: "23",
+	id: "24",
 	slug: "error-handling-workshop",
 	title: "Error Handling Workshop",
 	icon: "🔧",

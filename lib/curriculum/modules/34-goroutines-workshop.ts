@@ -2,7 +2,7 @@ import type { WorkshopModule } from "../types";
 
 export const goroutinesWorkshop: WorkshopModule = {
 	type: "workshop",
-	id: "31",
+	id: "34",
 	slug: "goroutines-workshop",
 	title: "Goroutines Workshop",
 	icon: "⚡",

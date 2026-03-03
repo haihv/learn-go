@@ -2,7 +2,7 @@ import type { LabModule } from "../types";
 
 export const errorHandlingLab: LabModule = {
 	type: "lab",
-	id: "24",
+	id: "25",
 	slug: "error-handling-lab",
 	title: "Input Validator Lab",
 	icon: "🛡️",

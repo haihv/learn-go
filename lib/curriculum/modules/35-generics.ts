@@ -2,7 +2,7 @@ import type { LessonModule } from "../types";
 
 export const generics: LessonModule = {
 	type: "lesson",
-	id: "32",
+	id: "35",
 	slug: "generics",
 	title: "Generics",
 	icon: "🧬",

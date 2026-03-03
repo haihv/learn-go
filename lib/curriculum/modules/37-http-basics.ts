@@ -2,7 +2,7 @@ import type { LessonModule } from "../types";
 
 export const httpBasics: LessonModule = {
 	type: "lesson",
-	id: "33",
+	id: "37",
 	slug: "http-basics",
 	title: "HTTP Basics",
 	icon: "🌐",

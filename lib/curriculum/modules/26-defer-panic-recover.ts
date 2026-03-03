@@ -2,7 +2,7 @@ import type { LessonModule } from "../types";
 
 export const deferPanicRecover: LessonModule = {
 	type: "lesson",
-	id: "25",
+	id: "26",
 	slug: "defer-panic-recover",
 	title: "Defer, Panic, and Recover",
 	icon: "🛟",

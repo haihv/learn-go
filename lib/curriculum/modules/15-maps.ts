@@ -2,7 +2,7 @@ import { WorkshopModule } from "../types";
 
 export const maps: WorkshopModule = {
   type: "workshop",
-  id: "14",
+  id: "15",
   slug: "maps",
   title: "Maps",
   icon: "🗺️",

@@ -2,7 +2,7 @@ import { LessonModule } from "../types";
 
 export const goroutines: LessonModule = {
   type: "lesson",
-  id: "30",
+  id: "33",
   slug: "goroutines",
   title: "Goroutines & Channels",
   icon: "⚡",

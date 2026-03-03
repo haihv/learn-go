@@ -2,7 +2,7 @@ import type { WorkshopModule } from "../types";
 
 export const httpWorkshop: WorkshopModule = {
 	type: "workshop",
-	id: "34",
+	id: "38",
 	slug: "http-workshop",
 	title: "HTTP Workshop",
 	icon: "🔨",

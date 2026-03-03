@@ -2,7 +2,7 @@ import type { LabModule } from "../types";
 
 export const jsonLab: LabModule = {
 	type: "lab",
-	id: "29",
+	id: "32",
 	slug: "json-lab",
 	title: "Product Catalog Lab",
 	icon: "🗃️",

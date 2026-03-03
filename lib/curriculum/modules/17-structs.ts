@@ -2,7 +2,7 @@ import { LessonModule } from "../types";
 
 export const structs: LessonModule = {
   type: "lesson",
-  id: "16",
+  id: "17",
   slug: "structs",
   title: "Structs",
   icon: "🏗️",

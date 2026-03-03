@@ -2,7 +2,7 @@ import type { LabModule } from "../types";
 
 export const slicesLab: LabModule = {
   type: "lab",
-  id: "13",
+  id: "14",
   slug: "slices-lab",
   title: "Functional Pipeline Lab",
   icon: "🔗",

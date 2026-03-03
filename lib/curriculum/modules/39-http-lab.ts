@@ -2,7 +2,7 @@ import type { LabModule } from "../types";
 
 export const httpLab: LabModule = {
 	type: "lab",
-	id: "35",
+	id: "39",
 	slug: "http-lab",
 	title: "Item Store API Lab",
 	icon: "🛒",

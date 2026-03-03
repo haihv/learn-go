@@ -2,7 +2,7 @@ import { LessonModule } from "../types";
 
 export const interfaces: LessonModule = {
   type: "lesson",
-  id: "19",
+  id: "20",
   slug: "interfaces",
   title: "Interfaces",
   icon: "🔌",

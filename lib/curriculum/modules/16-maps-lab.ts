@@ -2,7 +2,7 @@ import type { LabModule } from "../types";
 
 export const mapsLab: LabModule = {
   type: "lab",
-  id: "15",
+  id: "16",
   slug: "maps-lab",
   title: "Word Frequency Analyzer Lab",
   icon: "📊",

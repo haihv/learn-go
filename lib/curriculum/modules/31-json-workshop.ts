@@ -2,7 +2,7 @@ import type { WorkshopModule } from "../types";
 
 export const jsonWorkshop: WorkshopModule = {
 	type: "workshop",
-	id: "28",
+	id: "31",
 	slug: "json-workshop",
 	title: "JSON Workshop",
 	icon: "🔨",

@@ -2,7 +2,7 @@ import type { LessonModule } from "../types";
 
 export const errorHandling: LessonModule = {
 	type: "lesson",
-	id: "22",
+	id: "23",
 	slug: "error-handling",
 	title: "Error Handling",
 	icon: "⚠️",
