@@ -2,7 +2,7 @@ import { LessonModule } from "../types";
 
 export const controlFlow: LessonModule = {
   type: "lesson",
-  id: "07",
+  id: "11",
   slug: "control-flow",
   title: "Control Flow",
   icon: "🔀",

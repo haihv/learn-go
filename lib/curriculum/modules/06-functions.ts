@@ -2,7 +2,7 @@ import { LessonModule } from "../types";
 
 export const functions: LessonModule = {
   type: "lesson",
-  id: "04",
+  id: "06",
   slug: "functions",
   title: "Functions",
   icon: "⚙️",
@@ -100,6 +100,69 @@ You can also expand an existing slice into variadic arguments using the \`...\` 
 ## Functions as First-Class Values
 
 In Go, functions are first-class values — they can be assigned to variables, passed as arguments to other functions, and returned from functions. This enables powerful patterns like callbacks, middleware, and higher-order functions, which you will explore in later modules.
+
+## Named Function Types
+
+You can give a function signature a name with \`type\`. This is common for callbacks and middleware:
+
+\`\`\`go
+type MathOp func(int, int) int
+
+func apply(a, b int, op MathOp) int {
+    return op(a, b)
+}
+
+func main() {
+    add := func(a, b int) int { return a + b }
+    fmt.Println(apply(3, 4, add)) // 7
+}
+\`\`\`
+
+Named function types make signatures self-documenting and allow you to attach methods to function types — a technique used by \`http.HandlerFunc\` in the standard library.
+
+## Method Values
+
+When you access a method on a specific value, you get a **method value** — a function bound to that receiver:
+
+\`\`\`go
+type Counter struct{ n int }
+
+func (c *Counter) Inc() { c.n++ }
+func (c Counter) Value() int { return c.n }
+
+func main() {
+    c := &Counter{}
+    inc := c.Inc       // method value: inc() is equivalent to c.Inc()
+    inc()
+    inc()
+    fmt.Println(c.Value()) // 2
+}
+\`\`\`
+
+Method values are useful when you need to pass a method as a callback — they capture the receiver automatically.
+
+## The init() Function
+
+Go allows special \`init\` functions that run automatically before \`main\`:
+
+\`\`\`go
+package main
+
+import "fmt"
+
+var config string
+
+func init() {
+    // runs once at startup, before main — good for one-time setup
+    config = "production"
+}
+
+func main() {
+    fmt.Println(config) // production
+}
+\`\`\`
+
+Each package can have multiple \`init\` functions across multiple files; they run in the order they are imported. Keep \`init\` functions short and side-effect free — avoid putting complex logic there.
 `,
   quiz: [
     {

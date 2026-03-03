@@ -117,5 +117,48 @@ func main() {
         (code.includes("false") || code.match(/var\s+\w+\s+bool/) !== null),
       successMessage: "Every Go type has a zero value — no undefined or null!",
     },
+    {
+      instruction:
+        "Declare a constant `pi` with value `3.14159` and a constant block using `iota` for weekday names (Monday=1 through Sunday=7). Print `pi` and `Monday`.",
+      starterCode: `package main
+
+import "fmt"
+
+// TODO: declare const pi = 3.14159
+
+// TODO: declare a const block using iota for weekdays:
+// Monday = iota + 1 (so Monday=1, Tuesday=2, ...)
+
+func main() {
+	// TODO: print pi and Monday
+	fmt.Println()
+}
+`,
+      hint: `package main
+
+import "fmt"
+
+const pi = 3.14159
+
+const (
+	Monday = iota + 1
+	Tuesday
+	Wednesday
+	Thursday
+	Friday
+	Saturday
+	Sunday
+)
+
+func main() {
+	fmt.Println(pi)
+	fmt.Println(Monday) // 1
+}
+`,
+      validate: (code: string) =>
+        code.includes("const") && code.includes("iota"),
+      successMessage:
+        "`iota` starts at 0 in each const block and increments automatically — perfect for enums!",
+    },
   ],
 };

@@ -69,6 +69,10 @@ Unlike \`console.log\` in JavaScript or \`print\` in Python, \`Println\` always 
 | \`%d\` | Integer (decimal) |
 | \`%f\` | Floating-point |
 | \`%v\` | Default format for any value |
+| \`%+v\` | Struct with field names |
+| \`%#v\` | Go syntax representation |
+| \`%q\` | Quoted string |
+| \`%02d\` | Zero-padded integer |
 | \`%T\` | Type of the value |
 
 \`\`\`go
@@ -99,9 +103,43 @@ Value: 15, Type: int
 
 \`%v\` is the all-purpose verb — reach for it when you just want to see a value without caring about exact formatting. \`%T\` is especially useful while learning because it reveals what type Go inferred.
 
+## The Go Toolchain
+
+Go ships with a complete toolchain. You will use these commands constantly:
+
+\`\`\`
+go run main.go        # compile and immediately run a program
+go build ./...        # compile all packages, produce binaries
+go mod init myapp     # initialize a new module (creates go.mod)
+go get package@v1.2   # add or upgrade a dependency
+gofmt -w .            # format all Go files in place (auto-run by editors)
+go test ./...         # run all tests
+\`\`\`
+
+Every Go project is a **module**, identified by its \`go.mod\` file. The module path (e.g., \`github.com/you/myapp\`) is used in import statements. For the small playground programs in this course you can skip \`go mod init\` — the playground handles that for you.
+
+\`gofmt\` enforces a single canonical style. There is no debate about tabs vs spaces in Go: the answer is always tabs, enforced by tooling.
+
+## The Standard Library
+
+Go's standard library is unusually comprehensive. Before reaching for a third-party package, check if stdlib already has what you need:
+
+| Package | Purpose |
+|---|---|
+| \`fmt\` | Formatted I/O |
+| \`net/http\` | HTTP client and server |
+| \`encoding/json\` | JSON marshal / unmarshal |
+| \`strings\` | String manipulation |
+| \`strconv\` | Number ↔ string conversions |
+| \`os\` | File system and environment |
+| \`sync\` | Mutexes, WaitGroups |
+| \`errors\` | Error creation and inspection |
+
+You will use most of these packages before you finish this course.
+
 ## Go's Philosophy of Simplicity
 
-Go was designed with one guiding principle: *simplicity scales*. A small language means faster onboarding for new team members, consistent code style across large codebases, and fewer surprises at 2 am when something breaks in production. The standard library covers most everyday needs — HTTP servers, JSON encoding, cryptography — without pulling in third-party packages. As you work through this course, you will see that most Go code looks the same whether it was written by a beginner or a ten-year veteran. That consistency is the point.
+Go was designed with one guiding principle: *simplicity scales*. A small language means faster onboarding for new team members, consistent code style across large codebases, and fewer surprises at 2 am when something breaks in production. As you work through this course, you will see that most Go code looks the same whether it was written by a beginner or a ten-year veteran. That consistency is the point.
 `,
   quiz: [
     {

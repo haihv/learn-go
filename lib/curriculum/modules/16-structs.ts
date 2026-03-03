@@ -2,7 +2,7 @@ import { LessonModule } from "../types";
 
 export const structs: LessonModule = {
   type: "lesson",
-  id: "10",
+  id: "16",
   slug: "structs",
   title: "Structs",
   icon: "🏗️",
@@ -97,6 +97,55 @@ fmt.Println(e.Greet())   // Hi, I'm Bob — method promoted from Person
 \`Employee\` automatically gets all of \`Person\`'s fields and methods through **promotion**. This is composition, not inheritance: there is no parent/child relationship, no override chain, and no polymorphism unless you add an interface. You are simply embedding a value of type \`Person\` inside \`Employee\` and letting Go surface its members at the outer level for convenience.
 
 This approach keeps types simple and explicit — you always know exactly where a field or method comes from.
+
+### Struct Tags
+
+Struct fields can carry metadata called **tags**, written as raw string literals after the type. They are used by packages like \`encoding/json\` and \`database/sql\` to control serialization:
+
+\`\`\`go
+type User struct {
+    Name  string \`json:"name"\`
+    Email string \`json:"email,omitempty"\`
+    pw    string \`json:"-"\`  // excluded from JSON
+}
+\`\`\`
+
+Tags are pure metadata — the compiler ignores them; only reflection-based packages read them at runtime.
+
+### Anonymous Structs
+
+For one-off data shapes, you can define a struct inline without giving it a name:
+
+\`\`\`go
+point := struct {
+    X, Y int
+}{X: 3, Y: 4}
+fmt.Println(point.X, point.Y) // 3 4
+\`\`\`
+
+Anonymous structs are handy for test table rows, temporary groupings, and HTTP request/response shapes that only appear once.
+
+### Struct Comparison
+
+Two struct values are comparable with \`==\` if all their fields are comparable (no slices, maps, or functions). The comparison checks every field:
+
+\`\`\`go
+type Point struct{ X, Y int }
+
+a := Point{1, 2}
+b := Point{1, 2}
+c := Point{1, 3}
+
+fmt.Println(a == b) // true — all fields equal
+fmt.Println(a == c) // false — Y differs
+\`\`\`
+
+Comparable structs can also be used as map keys:
+
+\`\`\`go
+visits := map[Point]int{}
+visits[Point{0, 0}]++
+\`\`\`
 `,
   quiz: [
     {

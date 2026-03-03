@@ -2,7 +2,7 @@ import type { LabModule } from "../types";
 
 export const functionsLab: LabModule = {
   type: "lab",
-  id: "06",
+  id: "10",
   slug: "functions-lab",
   title: "Temperature Converter Lab",
   icon: "🌡️",

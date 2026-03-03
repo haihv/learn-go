@@ -2,7 +2,7 @@ import { WorkshopModule } from "../types";
 
 export const functionsWorkshop: WorkshopModule = {
   type: "workshop",
-  id: "05",
+  id: "07",
   slug: "functions-workshop",
   title: "Functions Workshop",
   icon: "🔨",

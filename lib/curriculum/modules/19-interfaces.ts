@@ -2,7 +2,7 @@ import { LessonModule } from "../types";
 
 export const interfaces: LessonModule = {
   type: "lesson",
-  id: "11",
+  id: "19",
   slug: "interfaces",
   title: "Interfaces",
   icon: "🔌",
@@ -140,6 +140,44 @@ default:
 \`\`\`
 
 Interfaces are the primary mechanism for polymorphism in Go — small, focused interface definitions lead to composable, testable code.
+
+## Interface Composition
+
+Interfaces can embed other interfaces to form larger contracts. The standard library uses this heavily:
+
+\`\`\`go
+type Reader interface {
+    Read(p []byte) (n int, err error)
+}
+
+type Writer interface {
+    Write(p []byte) (n int, err error)
+}
+
+// ReadWriter composes both — any type satisfying both Read and Write satisfies ReadWriter
+type ReadWriter interface {
+    Reader
+    Writer
+}
+\`\`\`
+
+\`io.Reader\` and \`io.Writer\` are the most important interfaces in Go's standard library. They appear everywhere: files, network connections, HTTP bodies, in-memory buffers. A function that accepts \`io.Reader\` works with all of them without knowing which one it has received.
+
+## The Interface Nil Pitfall
+
+A common source of bugs: an interface variable is only \`nil\` when both its type and value are nil. A typed nil pointer stored in an interface is **not** nil:
+
+\`\`\`go
+var p *Person = nil
+var s fmt.Stringer = p  // s has type *Person, value nil
+
+fmt.Println(p == nil) // true
+fmt.Println(s == nil) // false! — s has a type component set
+
+// Calling s.String() would panic — *Person is nil
+\`\`\`
+
+The fix is to return a bare \`nil\` (untyped) directly rather than assigning a typed nil to an interface variable. This is why error-returning functions should return \`nil\` as the error, not \`(*MyError)(nil)\`.
 `,
   quiz: [
     {
