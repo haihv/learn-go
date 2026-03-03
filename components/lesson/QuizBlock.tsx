@@ -16,8 +16,8 @@ export default function QuizBlock({ questions, onComplete }: Props) {
   function handleSubmit() {
     if (!allAnswered) return;
     setSubmitted(true);
-    const allCorrect = questions.every((q, i) => answers[i] === q.correctIndex);
-    if (allCorrect) onComplete();
+    // onComplete is called only when the user explicitly clicks "Continue →"
+    // so they can review the correct answers first.
   }
 
   const correctCount = submitted
@@ -69,11 +69,28 @@ export default function QuizBlock({ questions, onComplete }: Props) {
       ))}
 
       {submitted ? (
-        <p className={allCorrect ? "text-go-green" : "text-go-red"}>
-          {allCorrect
-            ? `${total}/${total} correct — unlocking next module!`
-            : `${correctCount}/${total} correct — review the highlighted answers above.`}
-        </p>
+        <div className="flex items-center gap-4 flex-wrap">
+          <p className={allCorrect ? "text-go-green" : "text-go-red"}>
+            {allCorrect
+              ? `${total}/${total} correct — correct answers highlighted above.`
+              : `${correctCount}/${total} correct — review the highlighted answers and try again.`}
+          </p>
+          {allCorrect ? (
+            <button
+              onClick={onComplete}
+              className="rounded-lg px-5 py-2 font-semibold bg-go-cyan text-navy-950 cursor-pointer"
+            >
+              Continue →
+            </button>
+          ) : (
+            <button
+              onClick={() => { setSubmitted(false); setAnswers({}); }}
+              className="rounded-lg px-5 py-2 font-semibold bg-navy-700 text-slate-200 cursor-pointer"
+            >
+              Try Again
+            </button>
+          )}
+        </div>
       ) : (
         <button
           onClick={handleSubmit}

@@ -11,6 +11,7 @@ import CelebrationOverlay from "@/components/ui/Celebration";
 import type { WorkshopModule } from "@/lib/curriculum/types";
 
 const GoEditor = dynamic(() => import("@/components/editor/GoEditor"), { ssr: false });
+const CodeBlock = dynamic(() => import("@/components/lesson/CodeBlock"), { ssr: false });
 
 type Props = {
   module: WorkshopModule;
@@ -24,28 +25,32 @@ type Feedback = {
 
 export default function WorkshopView({ module, onComplete }: Props) {
   const setWorkshopStep = useCourseStore((state) => state.setWorkshopStep);
+  const saveStepSolution = useCourseStore((state) => state.saveStepSolution);
   const initialStep = useCourseStore((state) => state.workshopSteps[module.slug] ?? 0);
+  const savedSolutions = useCourseStore((state) => state.workshopSolutions[module.slug] ?? {});
 
-  // Guard against a stored step that exceeds the current module's step count
   const safeInitialStep = Math.min(initialStep, module.steps.length - 1);
   const [currentStep, setCurrentStep] = useState<number>(safeInitialStep);
-  // All steps before the initial step were already completed in a previous session
   const [completedSteps, setCompletedSteps] = useState<number[]>(
     Array.from({ length: safeInitialStep }, (_, i) => i)
   );
-  const [code, setCode] = useState<string>(module.steps[safeInitialStep].starterCode);
+  const [code, setCode] = useState<string>(
+    savedSolutions[safeInitialStep] ?? module.steps[safeInitialStep].starterCode
+  );
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [hintVisible, setHintVisible] = useState<boolean>(false);
   const [showCelebration, setShowCelebration] = useState<boolean>(false);
   const [isChecking, setIsChecking] = useState<boolean>(false);
   const [runResult, setRunResult] = useState<RunResult | null>(null);
-  // Incremented on each run so OutputPanel remounts with the correct default tab
   const [runCount, setRunCount] = useState<number>(0);
+  // Set when the current step's validation passes — shows the Next Step button
+  const [readyToAdvance, setReadyToAdvance] = useState<boolean>(false);
 
   const handleCheck = useCallback(async () => {
     if (isChecking) return;
     setIsChecking(true);
     setFeedback(null);
+    setReadyToAdvance(false);
 
     const result = await runGoCode(code);
     setRunResult(result);
@@ -62,27 +67,34 @@ export default function WorkshopView({ module, onComplete }: Props) {
     setIsChecking(false);
 
     if (passed) {
+      // Save the passing code as the user's solution for this step
+      saveStepSolution(module.slug, currentStep, code);
       setFeedback({ ok: true, message: step.successMessage });
-      setTimeout(() => {
-        const isLast = currentStep === module.steps.length - 1;
-        if (isLast) {
-          setShowCelebration(true);
-          setTimeout(() => { onComplete(); }, 1000);
-        } else {
-          const nextStep = currentStep + 1;
-          setCompletedSteps((prev) => [...prev, currentStep]);
-          setWorkshopStep(module.slug, nextStep);
-          setCurrentStep(nextStep);
-          setCode(module.steps[nextStep].starterCode);
-          setFeedback(null);
-          setHintVisible(false);
-          setRunResult(null);
-        }
-      }, 800);
+      // Only offer to advance if this step wasn't already completed before
+      const alreadyDone = completedSteps.includes(currentStep);
+      if (!alreadyDone) setReadyToAdvance(true);
     } else {
       setFeedback({ ok: false, message: "Not quite — check your code and try again." });
     }
-  }, [isChecking, code, currentStep, module, setWorkshopStep, onComplete]);
+  }, [isChecking, code, currentStep, module, completedSteps, saveStepSolution]);
+
+  function handleAdvance() {
+    const isLast = currentStep === module.steps.length - 1;
+    if (isLast) {
+      setShowCelebration(true);
+      setTimeout(() => { onComplete(); }, 1000);
+    } else {
+      const nextStep = currentStep + 1;
+      setCompletedSteps((prev) => [...prev, currentStep]);
+      setWorkshopStep(module.slug, nextStep);
+      setCurrentStep(nextStep);
+      setCode(savedSolutions[nextStep] ?? module.steps[nextStep].starterCode);
+      setFeedback(null);
+      setHintVisible(false);
+      setRunResult(null);
+      setReadyToAdvance(false);
+    }
+  }
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -97,11 +109,15 @@ export default function WorkshopView({ module, onComplete }: Props) {
 
   function handleStepClick(step: number) {
     setCurrentStep(step);
-    setCode(module.steps[step].starterCode);
+    // Load the user's saved solution if available, otherwise the starter code
+    setCode(savedSolutions[step] ?? module.steps[step].starterCode);
     setFeedback(null);
     setHintVisible(false);
     setRunResult(null);
+    setReadyToAdvance(false);
   }
+
+  const isLastStep = currentStep === module.steps.length - 1;
 
   return (
     <div className="flex flex-col gap-6">
@@ -115,21 +131,30 @@ export default function WorkshopView({ module, onComplete }: Props) {
       <StepInstruction
         step={module.steps[currentStep]}
         stepNumber={currentStep + 1}
-        onShowHint={() => setHintVisible(!hintVisible)}
-        hintVisible={hintVisible}
       />
 
       <GoEditor value={code} onChange={setCode} />
 
       <div className="flex items-center gap-4">
-        <button
-          className="bg-go-cyan text-navy-950 font-bold px-4 py-2 rounded-lg disabled:opacity-50"
-          onClick={handleCheck}
-          disabled={isChecking}
-        >
-          {isChecking ? "Running…" : "Check Code"}
-        </button>
-        <span className="text-navy-500 text-xs">⌘ Enter (Mac) · Ctrl+Enter (Win/Linux)</span>
+        {readyToAdvance ? (
+          <button
+            className="bg-go-cyan text-navy-950 font-bold px-4 py-2 rounded-lg"
+            onClick={handleAdvance}
+          >
+            {isLastStep ? "Finish Workshop 🎉" : "Next Step →"}
+          </button>
+        ) : (
+          <button
+            className="bg-go-cyan text-navy-950 font-bold px-4 py-2 rounded-lg disabled:opacity-50"
+            onClick={handleCheck}
+            disabled={isChecking}
+          >
+            {isChecking ? "Running…" : "Check Code"}
+          </button>
+        )}
+        {!readyToAdvance && (
+          <span className="text-navy-500 text-xs">⌘ Enter (Mac) · Ctrl+Enter (Win/Linux)</span>
+        )}
       </div>
 
       {feedback && (
@@ -153,6 +178,21 @@ export default function WorkshopView({ module, onComplete }: Props) {
           defaultTab={runResult.stderr || runResult.error ? "errors" : "output"}
         />
       )}
+
+      {/* Hint is at the bottom so it doesn't obscure the workspace */}
+      <div className="border-t border-navy-700 pt-4">
+        <button
+          className="text-go-yellow text-sm underline"
+          onClick={() => setHintVisible((v) => !v)}
+        >
+          {hintVisible ? "Hide Hint" : "💡 Show Hint"}
+        </button>
+        {hintVisible && (
+          <div className="mt-3">
+            <CodeBlock code={module.steps[currentStep].hint} />
+          </div>
+        )}
+      </div>
 
       {showCelebration && <CelebrationOverlay />}
     </div>

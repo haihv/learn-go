@@ -26,14 +26,29 @@ export async function POST(req: NextRequest): Promise<NextResponse<RunResult>> {
   const timeout = setTimeout(() => controller.abort(), 10_000);
 
   try {
-    const res = await fetch("https://go.dev/play/p/run", {
+    // Use the form-encoded compile endpoint — more stable for programmatic access
+    const body = new URLSearchParams({ body: code, version: "2" });
+    const res = await fetch("https://play.golang.org/compile?output=json", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ version: 2, body: code }),
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: body.toString(),
       signal: controller.signal,
     });
 
-    const data = (await res.json()) as PlaygroundResponse;
+    // Parse as text first so a non-JSON response (e.g. rate-limit HTML page)
+    // is handled gracefully instead of throwing.
+    const text = await res.text();
+    let data: PlaygroundResponse;
+    try {
+      data = JSON.parse(text) as PlaygroundResponse;
+    } catch {
+      return NextResponse.json({
+        stdout: "",
+        stderr: "",
+        error: "Go Playground is unavailable — please try again in a moment.",
+        timedOut: false,
+      });
+    }
 
     let stdout = "";
     let stderr = data.Errors ?? "";
@@ -50,7 +65,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<RunResult>> {
       {
         stdout: "",
         stderr: "",
-        error: timedOut ? "timeout" : String(err),
+        error: timedOut ? "Execution timed out (10 s)" : String(err),
         timedOut,
       },
       { status: timedOut ? 504 : 500 }
