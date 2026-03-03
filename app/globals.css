@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-mono: var(--font-space-mono), ui-monospace, monospace;
+
+  /* Navy palette — backgrounds and borders */
+  --color-navy-950: #060e1d;
+  --color-navy-900: #080f1e;
+  --color-navy-800: #0f172a;
+  --color-navy-700: #1e293b;
+  --color-navy-600: #334155;
+  --color-navy-500: #475569;
+
+  /* Go brand palette — accents */
+  --color-go-cyan: #00d2a0;
+  --color-go-blue: #00b4d8;
+  --color-go-purple: #f0abfc;
+  --color-go-green: #86efac;
+  --color-go-red: #fca5a5;
+  --color-go-yellow: #fbbf24;
+}
+
+body {
+  background-color: var(--color-navy-950);
+  color: #e2e8f0;
+  font-family: var(--font-mono);
+}
