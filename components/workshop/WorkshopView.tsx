@@ -1,6 +1,6 @@
 "use client";
 import dynamic from "next/dynamic";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { useCourseStore } from "@/store/course";
 import { runGoCode } from "@/lib/go-runner";
 import type { RunResult } from "@/lib/go-runner";
@@ -98,17 +98,6 @@ export default function WorkshopView({ module, onComplete }: Props) {
     }
   }
 
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
-        e.preventDefault();
-        handleCheck();
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [handleCheck]);
-
   function handleStepClick(step: number) {
     setCurrentStep(step);
     // Load the user's saved solution if available, otherwise the starter code
@@ -135,7 +124,11 @@ export default function WorkshopView({ module, onComplete }: Props) {
         stepNumber={currentStep + 1}
       />
 
-      <GoEditor value={code} onChange={setCode} />
+      <GoEditor
+        value={code}
+        onChange={setCode}
+        onCmdEnter={readyToAdvance ? handleAdvance : handleCheck}
+      />
 
       <div className="flex items-center gap-4">
         {readyToAdvance ? (

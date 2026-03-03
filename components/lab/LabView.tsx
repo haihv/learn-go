@@ -49,7 +49,7 @@ export default function LabView({ module, onComplete }: Props) {
           <LabInstructions instructions={module.instructions} />
         </div>
         <div className="w-[60%] flex flex-col gap-4 p-4">
-          <GoEditor value={code} onChange={setCode} />
+          <GoEditor value={code} onChange={setCode} onCmdEnter={handleRun} />
           <div className="flex flex-row gap-2">
             <RunButton onRun={handleRun} isRunning={isRunning} />
             <button
@@ -83,7 +83,7 @@ export default function LabView({ module, onComplete }: Props) {
           )}
         </div>
         <div className="flex flex-col gap-4 p-4 flex-1 overflow-y-auto">
-          <GoEditor value={code} onChange={setCode} />
+          <GoEditor value={code} onChange={setCode} onCmdEnter={handleRun} />
           <div className="flex flex-row gap-2">
             <RunButton onRun={handleRun} isRunning={isRunning} />
             <button
