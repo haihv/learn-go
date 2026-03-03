@@ -1,21 +1,23 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { curriculum, getModuleIndex } from "@/lib/curriculum";
+import { curriculum, getModuleBySlug, getModuleIndex } from "@/lib/curriculum";
 import { useProgress } from "@/hooks/useProgress";
 import TopBar from "@/components/layout/TopBar";
 import LessonContent from "@/components/lesson/LessonContent";
 import QuizBlock from "@/components/lesson/QuizBlock";
 import WorkshopView from "@/components/workshop/WorkshopView";
 import LabView from "@/components/lab/LabView";
-import type { CourseModule } from "@/lib/curriculum/types";
 
 type Props = {
-  module: CourseModule;
+  slug: string;
 };
 
-export default function ModuleView({ module }: Props) {
+export default function ModuleView({ slug }: Props) {
   const router = useRouter();
   const { isComplete, markComplete } = useProgress();
+
+  const module = getModuleBySlug(slug);
+  if (!module) return null;
 
   const idx = getModuleIndex(module.slug);
   const prev = curriculum[idx - 1];

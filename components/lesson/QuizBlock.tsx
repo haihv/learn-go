@@ -30,7 +30,7 @@ export default function QuizBlock({ questions, onComplete }: Props) {
     <div>
       {questions.map((q, qi) => (
         <div key={qi} className="mb-6">
-          <p className="mb-3 font-medium text-navy-500">{q.question}</p>
+          <p className="mb-3 font-medium text-slate-100">{q.question}</p>
           <div className="flex flex-col gap-2">
             {q.options.map((option, oi) => {
               const isSelected = answers[qi] === oi;
@@ -38,7 +38,7 @@ export default function QuizBlock({ questions, onComplete }: Props) {
               const isWrongSelected = submitted && isSelected && !isCorrect;
 
               let styleClasses =
-                "border rounded-lg p-3 text-left w-full cursor-pointer bg-navy-800 border-navy-600 text-navy-500";
+                "border rounded-lg p-3 text-left w-full cursor-pointer bg-navy-800 border-navy-600 text-slate-300";
 
               if (submitted) {
                 styleClasses = "border rounded-lg p-3 text-left w-full cursor-default";
@@ -47,11 +47,11 @@ export default function QuizBlock({ questions, onComplete }: Props) {
                 } else if (isWrongSelected) {
                   styleClasses += " bg-go-red/20 border-go-red text-go-red";
                 } else {
-                  styleClasses += " bg-navy-800 border-navy-600 text-navy-500";
+                  styleClasses += " bg-navy-800 border-navy-600 text-slate-500";
                 }
               } else if (isSelected) {
                 styleClasses =
-                  "border rounded-lg p-3 text-left w-full cursor-pointer bg-navy-800 border-navy-600 text-navy-500 ring-2 ring-go-cyan";
+                  "border rounded-lg p-3 text-left w-full cursor-pointer bg-navy-700 border-go-cyan text-slate-100 ring-2 ring-go-cyan";
               }
 
               return (

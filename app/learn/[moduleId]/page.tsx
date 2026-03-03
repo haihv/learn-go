@@ -22,5 +22,7 @@ export default async function ModulePage({
   const { moduleId } = await params;
   const mod = getModuleBySlug(moduleId);
   if (!mod) notFound();
-  return <ModuleView module={mod} />;
+  // Pass only the slug — the client component looks up the module itself,
+  // avoiding Next.js serialization errors for validate functions.
+  return <ModuleView slug={moduleId} />;
 }

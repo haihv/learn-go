@@ -23,9 +23,11 @@ export default function WorkshopView({ module, onComplete }: Props) {
   const setWorkshopStep = useCourseStore((state) => state.setWorkshopStep);
   const initialStep = useCourseStore((state) => state.workshopSteps[module.slug] ?? 0);
 
-  const [currentStep, setCurrentStep] = useState<number>(initialStep);
+  // Guard against a stored step that exceeds the current module's step count
+  const safeInitialStep = Math.min(initialStep, module.steps.length - 1);
+  const [currentStep, setCurrentStep] = useState<number>(safeInitialStep);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
-  const [code, setCode] = useState<string>(module.steps[initialStep].starterCode);
+  const [code, setCode] = useState<string>(module.steps[safeInitialStep].starterCode);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [hintVisible, setHintVisible] = useState<boolean>(false);
   const [showCelebration, setShowCelebration] = useState<boolean>(false);
