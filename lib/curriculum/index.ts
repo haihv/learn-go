@@ -80,6 +80,16 @@ import { strconvModule } from "./modules/76-strconv";
 import { strconvWorkshop } from "./modules/77-strconv-workshop";
 import { profiling } from "./modules/78-profiling";
 import { profilingWorkshop } from "./modules/79-profiling-workshop";
+import { sortModule } from "./modules/80-sort";
+import { sortWorkshop } from "./modules/81-sort-workshop";
+import { regexpModule } from "./modules/82-regexp";
+import { regexpWorkshop } from "./modules/83-regexp-workshop";
+import { raceDetector } from "./modules/84-race-detector";
+import { raceDetectorWorkshop } from "./modules/85-race-detector-workshop";
+import { errorWrapping } from "./modules/86-error-wrapping";
+import { errorWrappingWorkshop } from "./modules/87-error-wrapping-workshop";
+import { osExec } from "./modules/88-os-exec";
+import { osExecWorkshop } from "./modules/89-os-exec-workshop";
 import type { CourseModule } from "./types";
 
 export const curriculum: CourseModule[] = [
@@ -146,6 +156,16 @@ export const curriculum: CourseModule[] = [
   strconvModule, strconvWorkshop,
   // Block 26: Profiling
   profiling, profilingWorkshop,
+  // Block 27: sort
+  sortModule, sortWorkshop,
+  // Block 28: regexp
+  regexpModule, regexpWorkshop,
+  // Block 29: Race Detector
+  raceDetector, raceDetectorWorkshop,
+  // Block 30: Error Wrapping & Sentinel Errors
+  errorWrapping, errorWrappingWorkshop,
+  // Block 31: os/exec
+  osExec, osExecWorkshop,
 ];
 
 export function getModuleBySlug(slug: string): CourseModule | undefined {
