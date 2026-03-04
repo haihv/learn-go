@@ -63,6 +63,23 @@ import { databaseSQLWorkshop } from "./modules/59-database-sql-workshop";
 import { databaseSQLLab } from "./modules/60-database-sql-lab";
 import { gracefulShutdown } from "./modules/61-graceful-shutdown";
 import { gracefulShutdownWorkshop } from "./modules/62-graceful-shutdown-workshop";
+import { embedding } from "./modules/63-embedding";
+import { embeddingWorkshop } from "./modules/64-embedding-workshop";
+import { typeAssertions } from "./modules/65-type-assertions";
+import { typeAssertionsWorkshop } from "./modules/66-type-assertions-workshop";
+import { httpMiddleware } from "./modules/67-http-middleware";
+import { httpMiddlewareWorkshop } from "./modules/68-http-middleware-workshop";
+import { httpMiddlewareLab } from "./modules/69-http-middleware-lab";
+import { httpClient } from "./modules/70-http-client";
+import { httpClientWorkshop } from "./modules/71-http-client-workshop";
+import { benchmarking } from "./modules/72-benchmarking";
+import { benchmarkingWorkshop } from "./modules/73-benchmarking-workshop";
+import { syncAtomic } from "./modules/74-sync-atomic";
+import { syncAtomicWorkshop } from "./modules/75-sync-atomic-workshop";
+import { strconvModule } from "./modules/76-strconv";
+import { strconvWorkshop } from "./modules/77-strconv-workshop";
+import { profiling } from "./modules/78-profiling";
+import { profilingWorkshop } from "./modules/79-profiling-workshop";
 import type { CourseModule } from "./types";
 
 export const curriculum: CourseModule[] = [
@@ -113,6 +130,22 @@ export const curriculum: CourseModule[] = [
   databaseSQL, databaseSQLWorkshop, databaseSQLLab,
   // Block 18: Graceful Shutdown
   gracefulShutdown, gracefulShutdownWorkshop,
+  // Block 19: Struct Embedding
+  embedding, embeddingWorkshop,
+  // Block 20: Type Assertions & Switches
+  typeAssertions, typeAssertionsWorkshop,
+  // Block 21: HTTP Middleware
+  httpMiddleware, httpMiddlewareWorkshop, httpMiddlewareLab,
+  // Block 22: HTTP Client
+  httpClient, httpClientWorkshop,
+  // Block 23: Benchmarking
+  benchmarking, benchmarkingWorkshop,
+  // Block 24: sync/atomic
+  syncAtomic, syncAtomicWorkshop,
+  // Block 25: strconv
+  strconvModule, strconvWorkshop,
+  // Block 26: Profiling
+  profiling, profilingWorkshop,
 ];
 
 export function getModuleBySlug(slug: string): CourseModule | undefined {
