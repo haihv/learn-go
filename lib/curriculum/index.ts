@@ -54,6 +54,15 @@ import { concurrencyPatterns } from "./modules/50-concurrency-patterns";
 import { concurrencyPatternsWorkshop } from "./modules/51-concurrency-patterns-workshop";
 import { slog } from "./modules/52-slog";
 import { slogWorkshop } from "./modules/53-slog-workshop";
+import { modulesPackages } from "./modules/54-modules-packages";
+import { modulesPackagesWorkshop } from "./modules/55-modules-packages-workshop";
+import { cliFlags } from "./modules/56-cli-flags";
+import { cliFlagsWorkshop } from "./modules/57-cli-flags-workshop";
+import { databaseSQL } from "./modules/58-database-sql";
+import { databaseSQLWorkshop } from "./modules/59-database-sql-workshop";
+import { databaseSQLLab } from "./modules/60-database-sql-lab";
+import { gracefulShutdown } from "./modules/61-graceful-shutdown";
+import { gracefulShutdownWorkshop } from "./modules/62-graceful-shutdown-workshop";
 import type { CourseModule } from "./types";
 
 export const curriculum: CourseModule[] = [
@@ -96,6 +105,14 @@ export const curriculum: CourseModule[] = [
   concurrencyPatterns, concurrencyPatternsWorkshop,
   // Block 14: Structured logging
   slog, slogWorkshop,
+  // Block 15: Go Modules & Packages
+  modulesPackages, modulesPackagesWorkshop,
+  // Block 16: CLI Flags & Env Vars
+  cliFlags, cliFlagsWorkshop,
+  // Block 17: database/sql
+  databaseSQL, databaseSQLWorkshop, databaseSQLLab,
+  // Block 18: Graceful Shutdown
+  gracefulShutdown, gracefulShutdownWorkshop,
 ];
 
 export function getModuleBySlug(slug: string): CourseModule | undefined {
