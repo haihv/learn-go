@@ -1,5 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 
+// Sliding window rate limiter: max 10 requests per IP per 60 seconds.
+// In-memory only — resets on server restart, not suitable for multi-instance deploys.
+const WINDOW_MS = 60_000;
+const MAX_REQUESTS = 10;
+const ipTimestamps = new Map<string, number[]>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const timestamps = (ipTimestamps.get(ip) ?? []).filter(
+    (t) => now - t < WINDOW_MS
+  );
+  if (timestamps.length >= MAX_REQUESTS) return true;
+  timestamps.push(now);
+  ipTimestamps.set(ip, timestamps);
+  return false;
+}
+
 type PlaygroundEvent = {
   Message: string;
   Kind: "stdout" | "stderr" | string;
@@ -20,6 +37,18 @@ type RunResult = {
 };
 
 export async function POST(req: NextRequest): Promise<NextResponse<RunResult>> {
+  const ip =
+    req.headers.get("x-forwarded-for")?.split(",")[0].trim() ??
+    req.headers.get("x-real-ip") ??
+    "unknown";
+
+  if (isRateLimited(ip)) {
+    return NextResponse.json(
+      { stdout: "", stderr: "", error: "Rate limit exceeded — wait a minute and try again.", timedOut: false },
+      { status: 429 }
+    );
+  }
+
   const { code } = (await req.json()) as { code: string };
 
   const controller = new AbortController();
