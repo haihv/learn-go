@@ -1,5 +1,6 @@
 "use client";
 import { useCourseStore } from "@/store/course";
+import { curriculum } from "@/lib/curriculum";
 
 type ProgressReturn = {
   isComplete: (slug: string) => boolean;
@@ -22,6 +23,6 @@ export function useProgress(): ProgressReturn {
     isComplete,
     markComplete,
     completedCount: completedSlugs.length,
-    totalCount: 12,
+    totalCount: curriculum.length,
   };
 }
