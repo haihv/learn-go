@@ -30,11 +30,18 @@ type PlaygroundResponse = {
   Status: number;
 };
 
+const MAX_CODE_BYTES = 65_536; // 64 KB
+// IPv4 / IPv6 sanity check — rejects obviously spoofed/blank values
+const IP_RE = /^[\d.a-fA-F:]+$/;
+
 export async function POST(req: NextRequest): Promise<NextResponse<RunResult>> {
-  const ip =
-    req.headers.get("x-forwarded-for")?.split(",")[0].trim() ??
+  // Prefer the rightmost entry added by a trusted proxy; fall back to x-real-ip
+  const forwarded = req.headers.get("x-forwarded-for");
+  const rawIp =
+    (forwarded ? forwarded.split(",").at(-1)!.trim() : null) ??
     req.headers.get("x-real-ip") ??
     "unknown";
+  const ip = IP_RE.test(rawIp) ? rawIp : "unknown";
 
   if (isRateLimited(ip)) {
     return NextResponse.json(
@@ -43,7 +50,35 @@ export async function POST(req: NextRequest): Promise<NextResponse<RunResult>> {
     );
   }
 
-  const { code } = (await req.json()) as { code: string };
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json(
+      { stdout: "", stderr: "", error: "Invalid request body.", timedOut: false },
+      { status: 400 }
+    );
+  }
+
+  if (
+    typeof body !== "object" ||
+    body === null ||
+    typeof (body as Record<string, unknown>).code !== "string"
+  ) {
+    return NextResponse.json(
+      { stdout: "", stderr: "", error: "Missing or invalid `code` field.", timedOut: false },
+      { status: 400 }
+    );
+  }
+
+  const { code } = body as { code: string };
+
+  if (Buffer.byteLength(code, "utf8") > MAX_CODE_BYTES) {
+    return NextResponse.json(
+      { stdout: "", stderr: "", error: "Code exceeds the 64 KB size limit.", timedOut: false },
+      { status: 413 }
+    );
+  }
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10_000);
