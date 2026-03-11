@@ -1,5 +1,5 @@
 import Badge from "@/components/ui/Badge";
-import { CourseModule } from "@/lib/curriculum/types";
+import type { CourseModule } from "@/lib/curriculum/types";
 
 type TopBarProps = {
   module: CourseModule;

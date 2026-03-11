@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import type { RunResult } from "@/lib/go-runner";
 
 // Sliding window rate limiter: max 10 requests per IP per 60 seconds.
 // In-memory only — resets on server restart, not suitable for multi-instance deploys.
@@ -27,13 +28,6 @@ type PlaygroundResponse = {
   Errors: string;
   Events: PlaygroundEvent[] | null;
   Status: number;
-};
-
-type RunResult = {
-  stdout: string;
-  stderr: string;
-  error: string | null;
-  timedOut: boolean;
 };
 
 export async function POST(req: NextRequest): Promise<NextResponse<RunResult>> {
@@ -94,7 +88,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<RunResult>> {
       {
         stdout: "",
         stderr: "",
-        error: timedOut ? "Execution timed out (10 s)" : String(err),
+        error: timedOut ? "Execution timed out (10 s)" : (err instanceof Error ? err.message : String(err)),
         timedOut,
       },
       { status: timedOut ? 504 : 500 }

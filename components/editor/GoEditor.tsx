@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useMemo, useEffect } from "react";
+import { useRef, useMemo, useEffect, useLayoutEffect } from "react";
 import CodeMirror from "@uiw/react-codemirror";
 import { go } from "@codemirror/lang-go";
 import { oneDark } from "@codemirror/theme-one-dark";
@@ -17,7 +17,11 @@ type GoEditorProps = {
 
 export default function GoEditor({ value, onChange, readOnly, onCmdEnter }: GoEditorProps) {
   const onCmdEnterRef = useRef(onCmdEnter);
-  onCmdEnterRef.current = onCmdEnter;
+  // Keep the ref in sync after every render so the keydown handler always calls
+  // the latest version without needing to be re-registered.
+  useLayoutEffect(() => {
+    onCmdEnterRef.current = onCmdEnter;
+  });
 
   const containerRef = useRef<HTMLDivElement>(null);
 

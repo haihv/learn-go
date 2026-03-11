@@ -1,6 +1,7 @@
 "use client";
 import { useState, useCallback, useRef } from "react";
-import { runGoCode, RunResult } from "@/lib/go-runner";
+import { runGoCode } from "@/lib/go-runner";
+import type { RunResult } from "@/lib/go-runner";
 
 type GoRunnerReturn = {
   run: (code: string) => Promise<void>;

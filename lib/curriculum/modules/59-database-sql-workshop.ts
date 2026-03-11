@@ -1,53 +1,5 @@
 import type { WorkshopModule } from "../types";
 
-// The mock driver setup is included in each step's starter code so students
-// can run the code in the Playground without a real database.
-const mockDriverSetup = `// mockDriver is a minimal in-memory database driver for learning purposes.
-// In a real project you would import a real driver like github.com/lib/pq.
-import (
-	"database/sql"
-	"database/sql/driver"
-	"io"
-)
-
-func init() {
-	sql.Register("mock", &mockDriver{})
-}
-
-type mockDriver struct{}
-type mockConn struct{ closed bool }
-type mockStmt struct{}
-type mockResult struct{}
-type mockRows struct{ done bool }
-type mockTx struct{}
-
-func (d *mockDriver) Open(_ string) (driver.Conn, error) { return &mockConn{}, nil }
-func (c *mockConn) Prepare(q string) (driver.Stmt, error) { return &mockStmt{}, nil }
-func (c *mockConn) Close() error                          { c.closed = true; return nil }
-func (c *mockConn) Begin() (driver.Tx, error)             { return &mockTx{}, nil }
-func (s *mockStmt) Close() error                          { return nil }
-func (s *mockStmt) NumInput() int                         { return -1 }
-func (s *mockStmt) Exec(_ []driver.Value) (driver.Result, error) {
-	return &mockResult{}, nil
-}
-func (s *mockStmt) Query(_ []driver.Value) (driver.Rows, error) {
-	return &mockRows{}, nil
-}
-func (r *mockResult) LastInsertId() (int64, error) { return 1, nil }
-func (r *mockResult) RowsAffected() (int64, error) { return 1, nil }
-func (r *mockRows) Columns() []string              { return []string{"id", "name"} }
-func (r *mockRows) Close() error                   { return nil }
-func (r *mockRows) Next(dest []driver.Value) error {
-	if r.done {
-		return io.EOF
-	}
-	r.done = true
-	dest[0] = int64(1)
-	dest[1] = "Alice"
-	return nil
-}
-func (t *mockTx) Commit() error   { return nil }
-func (t *mockTx) Rollback() error { return nil }`;
 
 export const databaseSQLWorkshop: WorkshopModule = {
   type: "workshop",
