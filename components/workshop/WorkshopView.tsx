@@ -8,6 +8,7 @@ import StepProgress from "@/components/workshop/StepProgress";
 import StepInstruction from "@/components/workshop/StepInstruction";
 import OutputPanel from "@/components/editor/OutputPanel";
 import CelebrationOverlay from "@/components/ui/Celebration";
+import { useShortcutKey } from "@/hooks/useShortcutKey";
 import type { WorkshopModule } from "@/lib/curriculum/types";
 
 const GoEditor = dynamic(() => import("@/components/editor/GoEditor"), { ssr: false });
@@ -27,20 +28,14 @@ export default function WorkshopView({ module, onComplete }: Props) {
   const setWorkshopStep = useCourseStore((state) => state.setWorkshopStep);
   const saveStepSolution = useCourseStore((state) => state.saveStepSolution);
   const markComplete = useCourseStore((state) => state.markComplete);
-  // initialStep starts at 0 (store default) and updates to the persisted value
-  // after Zustand's async localStorage hydration.
   const initialStep = useCourseStore((state) => state.workshopSteps[module.slug] ?? 0);
-  // ?? {} outside the selector to avoid a new object reference every render.
   const savedSolutions = useCourseStore((state) => state.workshopSolutions[module.slug]) ?? {};
 
-  // steps.length is the "all done" sentinel stored when the last step passes.
   const isAllDone = initialStep >= module.steps.length;
   const resolvedStep = isAllDone
     ? module.steps.length - 1
     : Math.min(initialStep, module.steps.length - 1);
 
-  // Derived from the store — always correct after Zustand hydrates, with no
-  // useState that could be stale from the pre-hydration render.
   const completedSteps = useMemo(() => {
     if (isAllDone) return Array.from({ length: module.steps.length }, (_, i) => i);
     return Array.from({ length: initialStep }, (_, i) => i);
@@ -57,19 +52,28 @@ export default function WorkshopView({ module, onComplete }: Props) {
   const [runResult, setRunResult] = useState<RunResult | null>(null);
   const [runCount, setRunCount] = useState(0);
   const [readyToAdvance, setReadyToAdvance] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Sync currentStep and code whenever initialStep changes. This handles
-  // both Zustand's async hydration (0 → stored value) and step advances.
+  const { mod } = useShortcutKey();
+
   useEffect(() => {
     setCurrentStep(resolvedStep);
     setCode(savedSolutions[resolvedStep] ?? module.steps[resolvedStep].starterCode);
     setFeedback(null);
     setReadyToAdvance(false);
     setRunResult(null);
-  // resolvedStep is the only dep we need; other values are read from the
-  // current render's closure when the effect fires.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resolvedStep]);
+
+  // Exit fullscreen on Escape
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsFullscreen(false);
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [isFullscreen]);
 
   const handleCheck = useCallback(async () => {
     if (isChecking) return;
@@ -98,8 +102,6 @@ export default function WorkshopView({ module, onComplete }: Props) {
       if (!alreadyDone) {
         setReadyToAdvance(true);
         if (currentStep === module.steps.length - 1) {
-          // Persist immediately — steps.length sentinel + markComplete so the
-          // sidebar ticks even if the user navigates away before "Finish".
           setWorkshopStep(module.slug, module.steps.length);
           markComplete(module.slug);
         }
@@ -116,7 +118,7 @@ export default function WorkshopView({ module, onComplete }: Props) {
       setTimeout(() => { onComplete(); }, 1000);
     } else {
       const nextStep = currentStep + 1;
-      setWorkshopStep(module.slug, nextStep); // triggers completedSteps update via useMemo
+      setWorkshopStep(module.slug, nextStep);
       setCurrentStep(nextStep);
       setCode(savedSolutions[nextStep] ?? module.steps[nextStep].starterCode);
       setFeedback(null);
@@ -137,85 +139,133 @@ export default function WorkshopView({ module, onComplete }: Props) {
 
   const isLastStep = currentStep === module.steps.length - 1;
 
-  return (
-    <div className="flex flex-col gap-6">
-      <StepProgress
-        steps={module.steps.length}
-        currentStep={currentStep}
-        completedSteps={completedSteps}
-        onStepClick={handleStepClick}
-      />
-
-      <StepInstruction
-        step={module.steps[currentStep]}
-        stepNumber={currentStep + 1}
-      />
-
-      <GoEditor
-        value={code}
-        onChange={setCode}
-        onCmdEnter={readyToAdvance ? handleAdvance : handleCheck}
-      />
-
-      <div className="flex items-center gap-4">
-        {readyToAdvance ? (
+  const actionBar = (
+    <div className="flex items-center gap-4">
+      {readyToAdvance ? (
+        <>
           <button
-            className="bg-go-cyan text-navy-950 font-bold px-4 py-2 rounded-lg"
+            className="bg-go-cyan text-navy-950 font-bold px-4 py-2 rounded-lg cursor-pointer"
             onClick={handleAdvance}
           >
             {isLastStep ? "Finish →" : "Next →"}
           </button>
-        ) : (
+          <span className="text-navy-500 text-xs">{mod}+Enter</span>
+        </>
+      ) : (
+        <>
           <button
-            className="bg-go-cyan text-navy-950 font-bold px-4 py-2 rounded-lg disabled:opacity-50"
+            className="bg-go-cyan text-navy-950 font-bold px-4 py-2 rounded-lg disabled:opacity-50 cursor-pointer"
             onClick={handleCheck}
             disabled={isChecking}
           >
             {isChecking ? "Running…" : "▶ Run & Check"}
           </button>
-        )}
-        {!readyToAdvance && (
-          <span className="text-navy-500 text-xs">⌘ Enter (Mac) · Ctrl+Enter (Win/Linux)</span>
-        )}
-      </div>
+          <span className="text-navy-500 text-xs">{mod}+Enter to run</span>
+        </>
+      )}
+    </div>
+  );
 
-      {feedback && (
-        <div
-          className={
-            feedback.ok
-              ? "bg-go-green/20 border border-go-green text-go-green rounded-lg px-4 py-3"
-              : "bg-go-red/20 border border-go-red text-go-red rounded-lg px-4 py-3"
-          }
-        >
-          {feedback.message}
+  return (
+    <>
+      {/* Fullscreen overlay */}
+      {isFullscreen && (
+        <div className="fixed inset-0 z-50 bg-navy-950 flex flex-col">
+          <div className="h-12 border-b border-navy-600 flex items-center px-4 justify-between shrink-0">
+            <span className="text-slate-400 text-sm font-mono">
+              Step {currentStep + 1} / {module.steps.length} — {module.title}
+            </span>
+            <button
+              onClick={() => setIsFullscreen(false)}
+              className="text-slate-400 hover:text-slate-200 bg-navy-800 hover:bg-navy-700 rounded px-3 py-1 text-sm cursor-pointer"
+            >
+              ✕ Exit Fullscreen
+            </button>
+          </div>
+          <div className="flex-1 min-h-0 p-4 flex flex-col gap-4">
+            <GoEditor
+              value={code}
+              onChange={setCode}
+              onCmdEnter={readyToAdvance ? handleAdvance : handleCheck}
+              height="calc(100vh - 250px)"
+            />
+            {actionBar}
+            {runResult && (
+              <div className="max-h-[28vh] overflow-y-auto">
+                <OutputPanel
+                  key={runCount}
+                  stdout={runResult.stdout}
+                  stderr={runResult.stderr}
+                  error={runResult.error}
+                  defaultTab={runResult.stderr || runResult.error ? "errors" : "output"}
+                />
+              </div>
+            )}
+          </div>
         </div>
       )}
 
-      {runResult && (
-        <OutputPanel
-          key={runCount}
-          stdout={runResult.stdout}
-          stderr={runResult.stderr}
-          error={runResult.error}
-          defaultTab={runResult.stderr || runResult.error ? "errors" : "output"}
+      {/* Normal view */}
+      <div className="flex flex-col gap-6">
+        <StepProgress
+          steps={module.steps.length}
+          currentStep={currentStep}
+          completedSteps={completedSteps}
+          onStepClick={handleStepClick}
         />
-      )}
 
-      <div className="border-t border-navy-700 pt-4">
-        <button
-          className="text-go-yellow text-sm underline"
-          onClick={() => setHintVisible((v) => !v)}
-        >
-          {hintVisible ? "Hide Hint" : "💡 Show Hint"}
-        </button>
-        {hintVisible && (
-          <div className="mt-3">
-            <CodeBlock code={module.steps[currentStep].hint} />
+        <StepInstruction
+          step={module.steps[currentStep]}
+          stepNumber={currentStep + 1}
+        />
+
+        <GoEditor
+          value={code}
+          onChange={setCode}
+          onCmdEnter={readyToAdvance ? handleAdvance : handleCheck}
+          onFullscreen={() => setIsFullscreen(true)}
+        />
+
+        {actionBar}
+
+        {feedback && (
+          <div
+            className={
+              feedback.ok
+                ? "bg-go-green/20 border border-go-green text-go-green rounded-lg px-4 py-3"
+                : "bg-go-red/20 border border-go-red text-go-red rounded-lg px-4 py-3"
+            }
+          >
+            {feedback.message}
           </div>
         )}
-      </div>
 
-      {showCelebration && <CelebrationOverlay />}
-    </div>
+        {runResult && (
+          <OutputPanel
+            key={runCount}
+            stdout={runResult.stdout}
+            stderr={runResult.stderr}
+            error={runResult.error}
+            defaultTab={runResult.stderr || runResult.error ? "errors" : "output"}
+          />
+        )}
+
+        <div className="border-t border-navy-700 pt-4">
+          <button
+            className="text-go-yellow text-sm underline cursor-pointer"
+            onClick={() => setHintVisible((v) => !v)}
+          >
+            {hintVisible ? "Hide Hint" : "💡 Show Hint"}
+          </button>
+          {hintVisible && (
+            <div className="mt-3">
+              <CodeBlock code={module.steps[currentStep].hint} />
+            </div>
+          )}
+        </div>
+
+        {showCelebration && <CelebrationOverlay />}
+      </div>
+    </>
   );
 }

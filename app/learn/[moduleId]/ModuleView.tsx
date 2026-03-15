@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { curriculum, getModuleBySlug, getModuleIndex } from "@/lib/curriculum";
 import { useProgress } from "@/hooks/useProgress";
@@ -10,18 +11,38 @@ import LabView from "@/components/lab/LabView";
 
 type Props = {
   slug: string;
+  sidebarCollapsed: boolean;
+  onToggleSidebar: () => void;
 };
 
-export default function ModuleView({ slug }: Props) {
+export default function ModuleView({ slug, sidebarCollapsed, onToggleSidebar }: Props) {
   const router = useRouter();
   const { isComplete, markComplete } = useProgress();
 
   const mod = getModuleBySlug(slug);
-  if (!mod) return null;
+  const idx = mod ? getModuleIndex(mod.slug) : -1;
+  const prev = idx >= 0 ? curriculum[idx - 1] : undefined;
+  const next = idx >= 0 ? curriculum[idx + 1] : undefined;
 
-  const idx = getModuleIndex(mod.slug);
-  const prev = curriculum[idx - 1];
-  const next = curriculum[idx + 1];
+  // Alt+→ / Alt+← to navigate between modules
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (!e.altKey) return;
+      const target = e.target as HTMLElement;
+      if (target.closest?.(".cm-editor")) return;
+      if (e.key === "ArrowRight" && next) {
+        e.preventDefault();
+        router.push(`/learn/${next.slug}`);
+      } else if (e.key === "ArrowLeft" && prev) {
+        e.preventDefault();
+        router.push(`/learn/${prev.slug}`);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [next, prev, router]);
+
+  if (!mod) return null;
 
   const handleComplete = () => {
     markComplete(mod.slug);
@@ -42,6 +63,8 @@ export default function ModuleView({ slug }: Props) {
         hasNext={!!next}
         isComplete={isComplete(mod.slug)}
         onMarkComplete={handleMarkComplete}
+        sidebarCollapsed={sidebarCollapsed}
+        onToggleSidebar={onToggleSidebar}
       />
       <div className="flex-1 overflow-y-auto">
         {mod.type === "lesson" && (

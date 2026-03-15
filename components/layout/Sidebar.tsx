@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useProgress } from "@/hooks/useProgress";
 import ProgressBar from "@/components/ui/ProgressBar";
 import Badge from "@/components/ui/Badge";
@@ -9,6 +9,8 @@ type SidebarProps = {
   modules: CourseModule[];
   currentSlug: string;
   onNavigate: (slug: string) => void;
+  onCollapse: () => void;
+  collapsed: boolean;
 };
 
 type ContentProps = {
@@ -18,20 +20,37 @@ type ContentProps = {
   totalCount: number;
   isComplete: (slug: string) => boolean;
   onNavigate: (slug: string) => void;
+  onCollapse: () => void;
 };
 
-function SidebarContent({ modules, currentSlug, completedCount, totalCount, isComplete, onNavigate }: ContentProps) {
+function SidebarContent({ modules, currentSlug, completedCount, totalCount, isComplete, onNavigate, onCollapse }: ContentProps) {
+  const activeRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    activeRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+  }, [currentSlug]);
+
   return (
     <>
       <div className="p-4 border-b border-navy-600">
-        <div className="text-go-cyan font-bold text-lg mb-2">🐹 Learn Go</div>
+        <div className="flex items-start justify-between mb-2">
+          <div className="text-go-cyan font-bold text-lg">🐹 Learn Go</div>
+          <button
+            onClick={onCollapse}
+            className="text-slate-400 hover:text-slate-200 text-base shrink-0 mt-0.5 ml-2 cursor-pointer"
+            title="Hide sidebar"
+          >
+            «
+          </button>
+        </div>
         <ProgressBar completed={completedCount} total={totalCount} />
       </div>
       <div className="flex-1 overflow-y-auto py-2">
         {modules.map((m) => (
           <button
             key={m.id}
-            className={`w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-navy-700 transition-colors${m.slug === currentSlug ? " bg-navy-700" : ""}`}
+            ref={m.slug === currentSlug ? activeRef : null}
+            className={`w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-navy-700 transition-colors cursor-pointer${m.slug === currentSlug ? " bg-navy-700" : ""}`}
             onClick={() => onNavigate(m.slug)}
           >
             <span className="w-6 text-center">
@@ -46,7 +65,7 @@ function SidebarContent({ modules, currentSlug, completedCount, totalCount, isCo
   );
 }
 
-export default function Sidebar({ modules, currentSlug, onNavigate }: SidebarProps) {
+export default function Sidebar({ modules, currentSlug, onNavigate, onCollapse, collapsed }: SidebarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { isComplete, completedCount, totalCount } = useProgress();
 
@@ -55,16 +74,24 @@ export default function Sidebar({ modules, currentSlug, onNavigate }: SidebarPro
     setMobileOpen(false);
   };
 
-  const contentProps: ContentProps = { modules, currentSlug, completedCount, totalCount, isComplete, onNavigate: handleNavigate };
+  const contentProps: ContentProps = {
+    modules,
+    currentSlug,
+    completedCount,
+    totalCount,
+    isComplete,
+    onNavigate: handleNavigate,
+    onCollapse,
+  };
 
   return (
     <>
-      <aside className="hidden md:flex w-[260px] h-full bg-navy-900 border-r border-navy-600 flex-col">
+      <aside className={`hidden md:flex h-full bg-navy-900 border-r border-navy-600 flex-col shrink-0 overflow-hidden transition-[width] duration-150 ease-in-out ${collapsed ? "w-0" : "w-[260px]"}`}>
         <SidebarContent {...contentProps} />
       </aside>
 
       <button
-        className="md:hidden fixed top-4 left-4 z-50 text-slate-200 text-xl"
+        className="md:hidden fixed top-4 left-4 z-50 text-slate-200 text-xl cursor-pointer"
         onClick={() => setMobileOpen(true)}
         aria-label="Open menu"
       >
@@ -74,11 +101,11 @@ export default function Sidebar({ modules, currentSlug, onNavigate }: SidebarPro
       {mobileOpen && (
         <>
           <div
-            className="md:hidden fixed inset-0 z-30 bg-black/50"
+            className="md:hidden fixed inset-0 z-30 bg-black/50 cursor-pointer"
             onClick={() => setMobileOpen(false)}
           />
           <aside className="md:hidden fixed inset-y-0 left-0 z-40 w-[260px] bg-navy-900 border-r border-navy-600 flex flex-col">
-            <SidebarContent {...contentProps} />
+            <SidebarContent {...contentProps} onCollapse={() => setMobileOpen(false)} />
           </aside>
         </>
       )}

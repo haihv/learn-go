@@ -24,5 +24,6 @@ export default async function ModulePage({
   if (!mod) notFound();
   // Pass only the slug — the client component looks up the module itself,
   // avoiding Next.js serialization errors for validate functions.
-  return <ModuleView slug={moduleId} />;
+  // Layout renders ModuleView directly with sidebar state — page only needed for metadata
+  return null;
 }

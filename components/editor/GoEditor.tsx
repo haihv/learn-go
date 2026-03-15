@@ -13,9 +13,11 @@ type GoEditorProps = {
   onChange: (v: string) => void;
   readOnly?: boolean;
   onCmdEnter?: () => void;
+  height?: string;
+  onFullscreen?: () => void;
 };
 
-export default function GoEditor({ value, onChange, readOnly, onCmdEnter }: GoEditorProps) {
+export default function GoEditor({ value, onChange, readOnly, onCmdEnter, height = "400px", onFullscreen }: GoEditorProps) {
   const onCmdEnterRef = useRef(onCmdEnter);
   // Keep the ref in sync after every render so the keydown handler always calls
   // the latest version without needing to be re-registered.
@@ -52,13 +54,22 @@ export default function GoEditor({ value, onChange, readOnly, onCmdEnter }: GoEd
   ], []);
 
   return (
-    <div ref={containerRef} className="rounded-lg overflow-hidden border border-navy-600">
+    <div ref={containerRef} className="rounded-lg overflow-hidden border border-navy-600 relative">
+      {onFullscreen && (
+        <button
+          onClick={onFullscreen}
+          className="absolute top-1.5 right-1.5 z-10 text-slate-500 hover:text-slate-200 bg-navy-900/80 hover:bg-navy-800 rounded px-1.5 py-0.5 text-xs leading-none cursor-pointer"
+          title="Open fullscreen (Esc to close)"
+        >
+          ⛶
+        </button>
+      )}
       <CodeMirror
         value={value}
         onChange={onChange}
         extensions={extensions}
         theme={oneDark}
-        minHeight="280px"
+        height={height}
         className="font-mono"
         basicSetup={{ lineNumbers: true }}
         editable={!readOnly}
