@@ -48,7 +48,7 @@ export default function ModuleView({ slug, sidebarCollapsed, onToggleSidebar }: 
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4 text-center px-6">
         <p className="text-2xl font-bold font-mono text-go-red">Module not found</p>
-        <p className="text-slate-400">
+        <p className="text-stone-500">
           No module exists at <code className="text-go-cyan">/learn/{slug}</code>.
         </p>
         <button

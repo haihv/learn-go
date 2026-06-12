@@ -177,12 +177,12 @@ export default function WorkshopView({ module, onComplete }: Props) {
       {isFullscreen && (
         <div className="fixed inset-0 z-50 bg-navy-950 flex flex-col">
           <div className="h-12 border-b border-navy-600 flex items-center px-4 justify-between shrink-0">
-            <span className="text-slate-400 text-sm font-mono">
+            <span className="text-stone-500 text-sm font-mono">
               Step {currentStep + 1} / {module.steps.length} — {module.title}
             </span>
             <button
               onClick={() => setIsFullscreen(false)}
-              className="text-slate-400 hover:text-slate-200 bg-navy-800 hover:bg-navy-700 rounded px-3 py-1 text-sm cursor-pointer"
+              className="text-stone-500 hover:text-stone-800 bg-navy-800 hover:bg-navy-700 rounded px-3 py-1 text-sm cursor-pointer"
             >
               ✕ Exit Fullscreen
             </button>

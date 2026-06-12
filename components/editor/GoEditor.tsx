@@ -58,7 +58,7 @@ export default function GoEditor({ value, onChange, readOnly, onCmdEnter, height
       {onFullscreen && (
         <button
           onClick={onFullscreen}
-          className="absolute top-1.5 right-1.5 z-10 text-slate-500 hover:text-slate-200 bg-navy-900/80 hover:bg-navy-800 rounded px-1.5 py-0.5 text-xs leading-none cursor-pointer"
+          className="absolute top-1.5 right-1.5 z-10 text-stone-400 hover:text-stone-800 bg-navy-900/80 hover:bg-navy-800 rounded px-1.5 py-0.5 text-xs leading-none cursor-pointer"
           title="Open fullscreen (Esc to close)"
         >
           ⛶

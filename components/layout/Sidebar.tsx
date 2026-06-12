@@ -37,7 +37,7 @@ function SidebarContent({ modules, currentSlug, completedCount, totalCount, isCo
           <div className="text-go-cyan font-bold text-lg">🐹 Learn Go</div>
           <button
             onClick={onCollapse}
-            className="text-slate-400 hover:text-slate-200 text-base shrink-0 mt-0.5 ml-2 cursor-pointer"
+            className="text-stone-500 hover:text-stone-800 text-base shrink-0 mt-0.5 ml-2 cursor-pointer"
             title="Hide sidebar"
           >
             «
@@ -56,7 +56,7 @@ function SidebarContent({ modules, currentSlug, completedCount, totalCount, isCo
             <span className="w-6 text-center">
               {isComplete(m.slug) ? "✅" : m.icon}
             </span>
-            <span className="flex-1 text-sm text-slate-200">{m.title}</span>
+            <span className="flex-1 text-sm text-stone-800">{m.title}</span>
             <Badge type={m.type} />
           </button>
         ))}
@@ -91,7 +91,7 @@ export default function Sidebar({ modules, currentSlug, onNavigate, onCollapse, 
       </aside>
 
       <button
-        className="md:hidden fixed top-4 left-4 z-50 text-slate-200 text-xl cursor-pointer"
+        className="md:hidden fixed top-4 left-4 z-50 text-stone-800 text-xl cursor-pointer"
         onClick={() => setMobileOpen(true)}
         aria-label="Open menu"
       >

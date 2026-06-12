@@ -1,36 +1,48 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-space-mono), ui-monospace, monospace;
+  --font-serif: var(--font-source-serif), Georgia, serif;
   --font-mono: var(--font-space-mono), ui-monospace, monospace;
 
-  /* Navy palette — backgrounds and borders, dark indigo ramp with
-     distinct steps so panels, cards and hovers read as separate layers */
-  --color-navy-950: #080d1a;
-  --color-navy-900: #0d1424;
-  --color-navy-800: #141e33;
-  --color-navy-700: #20304f;
-  --color-navy-600: #31436a;
-  --color-navy-500: #6b7a99;
+  /* Paper palette — warm cream surfaces and ink-toned borders.
+     Token names are kept from the dark theme so existing JSX reskins:
+     950 = page, 900 = panels, 800 = cards, 700 = hover, 600 = borders,
+     500 = muted text */
+  --color-navy-950: #f4f1e8;
+  --color-navy-900: #ece8db;
+  --color-navy-800: #fdfcf7;
+  --color-navy-700: #e4decb;
+  --color-navy-600: #d6cfba;
+  --color-navy-500: #8c8472;
 
-  /* Go brand palette — accents */
-  --color-go-cyan: #2be8c8;
-  --color-go-blue: #38bdf8;
-  --color-go-purple: #c084fc;
-  --color-go-green: #4ade80;
-  --color-go-red: #fb7185;
-  --color-go-yellow: #fbbf24;
+  /* Go accent palette — ink-strength colors that read on paper.
+     Translucent variants (e.g. bg-go-blue/20) become pastel chips */
+  --color-go-cyan: #0c7a68;
+  --color-go-blue: #2767a8;
+  --color-go-purple: #7c5cb0;
+  --color-go-green: #3e7d4f;
+  --color-go-red: #c2402e;
+  --color-go-yellow: #a16207;
 }
 
 body {
   background-color: var(--color-navy-950);
-  color: #e2e8f0;
-  font-family: var(--font-sans);
+  /* Subtle dotted grid, the texture of graph paper */
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--color-navy-600) 55%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 22px 22px;
+  color: #292524;
+  /* Reference the next/font variable directly — @theme inline tokens are
+     inlined into utilities and don't exist as runtime CSS variables here */
+  font-family: var(--font-space-mono), ui-monospace, monospace;
 }
 
 ::selection {
-  background-color: color-mix(in srgb, var(--color-go-cyan) 30%, transparent);
-  color: #f8fafc;
+  background-color: color-mix(in srgb, var(--color-go-cyan) 25%, transparent);
+  color: #1c1917;
 }
 
 :focus-visible {
@@ -38,7 +50,7 @@ body {
   outline-offset: 2px;
 }
 
-/* Slim scrollbars that blend with the navy surfaces */
+/* Slim scrollbars that blend with the paper surfaces */
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--color-navy-600) transparent;
@@ -53,20 +65,4 @@ body {
 }
 *::-webkit-scrollbar-thumb:hover {
   background-color: var(--color-navy-500);
-}
-
-/* Soft radial accent glows for the landing hero */
-.hero-glow {
-  background:
-    radial-gradient(
-      ellipse 50% 40% at 30% 20%,
-      color-mix(in srgb, var(--color-go-cyan) 9%, transparent),
-      transparent
-    ),
-    radial-gradient(
-      ellipse 50% 40% at 75% 70%,
-      color-mix(in srgb, var(--color-go-blue) 8%, transparent),
-      transparent
-    ),
-    var(--color-navy-950);
 }

@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { Inter, Space_Mono } from "next/font/google";
+import { Source_Serif_4, Space_Mono } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const sourceSerif = Source_Serif_4({
+  weight: ["600", "700"],
+  variable: "--font-source-serif",
   subsets: ["latin"],
 });
 
@@ -24,7 +25,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${spaceMono.variable} antialiased`}>{children}</body>
+      <body className={`${sourceSerif.variable} ${spaceMono.variable} antialiased`}>{children}</body>
     </html>
   );
 }
