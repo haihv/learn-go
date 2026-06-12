@@ -1,6 +1,7 @@
 "use client";
 import { useShortcutKey } from "@/hooks/useShortcutKey";
 import Badge from "@/components/ui/Badge";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 import type { CourseModule } from "@/lib/curriculum/types";
 
 type TopBarProps = {
@@ -96,6 +97,8 @@ export default function TopBar({
         {isComplete && !hasNext && (
           <span className="text-go-cyan text-sm font-bold">Course Complete! 🎉</span>
         )}
+
+        <ThemeToggle className="ml-1" />
       </div>
     </div>
   );

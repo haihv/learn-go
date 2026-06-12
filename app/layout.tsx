@@ -20,11 +20,17 @@ export const metadata: Metadata = {
     "An interactive Go course with lessons, workshops, and labs — modeled after freeCodeCamp.",
 };
 
+// Runs before paint so a stored/system dark preference never flashes light
+const themeBootstrap = `(function(){try{var t=localStorage.getItem("theme");var d=t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.classList.add("dark")}catch(e){}})()`;
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
+      </head>
       <body className={`${sourceSerif.variable} ${spaceMono.variable} antialiased`}>{children}</body>
     </html>
   );
