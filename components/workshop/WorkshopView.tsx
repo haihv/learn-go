@@ -56,14 +56,19 @@ export default function WorkshopView({ module, onComplete }: Props) {
 
   const { mod } = useShortcutKey();
 
-  useEffect(() => {
+  // Reset during render (not in an effect) when the step — or the module
+  // itself — changes. Keying on the slug matters: two workshops can sit on
+  // the same step index and would otherwise keep the previous editor state.
+  const [prevKey, setPrevKey] = useState(`${module.slug}:${resolvedStep}`);
+  const stepKey = `${module.slug}:${resolvedStep}`;
+  if (prevKey !== stepKey) {
+    setPrevKey(stepKey);
     setCurrentStep(resolvedStep);
     setCode(savedSolutions[resolvedStep] ?? module.steps[resolvedStep].starterCode);
     setFeedback(null);
     setReadyToAdvance(false);
     setRunResult(null);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resolvedStep]);
+  }
 
   // Exit fullscreen on Escape
   useEffect(() => {
