@@ -1,6 +1,4 @@
-import { notFound } from "next/navigation";
 import { getModuleBySlug } from "@/lib/curriculum";
-import ModuleView from "./ModuleView";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -10,20 +8,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { moduleId } = await params;
   const mod = getModuleBySlug(moduleId);
-  if (!mod) return {};
+  if (!mod) return { title: "Module not found — Learn Go" };
   return { title: `${mod.title} — Learn Go` };
 }
 
-export default async function ModulePage({
-  params,
-}: {
-  params: Promise<{ moduleId: string }>;
-}) {
-  const { moduleId } = await params;
-  const mod = getModuleBySlug(moduleId);
-  if (!mod) notFound();
-  // Pass only the slug — the client component looks up the module itself,
-  // avoiding Next.js serialization errors for validate functions.
-  // Layout renders ModuleView directly with sidebar state — page only needed for metadata
+// The layout renders ModuleView directly (it owns sidebar state), so the page
+// exists only for metadata. Throwing notFound() here would suppress the
+// layout's not-found UI without ever showing the 404 boundary.
+export default function ModulePage() {
   return null;
 }

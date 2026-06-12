@@ -8,13 +8,12 @@ import ModuleView from "@/app/learn/[moduleId]/ModuleView";
 export default function LearnLayout({ children: _ }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const pathnameSlug = pathname.split("/").pop() ?? "";
-  const [clientSlug, setClientSlug] = useState<string | null>(null);
+  // Derive the slug from the URL only — keeping it in local state desyncs
+  // the view from the address bar on TopBar/keyboard/back navigation.
+  const currentSlug = pathname.split("/").pop() ?? "";
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const currentSlug = clientSlug ?? pathnameSlug;
 
   const handleNavigate = (slug: string) => {
-    setClientSlug(slug);
     router.push(`/learn/${slug}`);
   };
 

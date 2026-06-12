@@ -12,8 +12,8 @@ An interactive Go learning platform built with Next.js. Work through lessons, wo
 ## Getting Started
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
@@ -30,9 +30,9 @@ Or visit the live site at [learn-go.haihv.dev](https://learn-go.haihv.dev).
 ## Scripts
 
 ```bash
-npm run dev      # development server
-npm run build    # production build
-npm run lint     # ESLint
+pnpm dev      # development server
+pnpm build    # production build
+pnpm lint     # ESLint
 ```
 
 ## Built with

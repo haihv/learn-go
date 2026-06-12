@@ -42,7 +42,24 @@ export default function ModuleView({ slug, sidebarCollapsed, onToggleSidebar }: 
     return () => window.removeEventListener("keydown", handler);
   }, [next, prev, router]);
 
-  if (!mod) return null;
+  // The layout bypasses the route's not-found boundary, so unknown slugs
+  // land here — show a recovery path instead of a blank pane.
+  if (!mod) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-4 text-center px-6">
+        <p className="text-2xl font-bold font-mono text-go-red">Module not found</p>
+        <p className="text-slate-400">
+          No module exists at <code className="text-go-cyan">/learn/{slug}</code>.
+        </p>
+        <button
+          onClick={() => router.push(`/learn/${curriculum[0].slug}`)}
+          className="rounded-lg px-5 py-2 font-semibold bg-go-cyan text-navy-950 cursor-pointer"
+        >
+          Back to the first module
+        </button>
+      </div>
+    );
+  }
 
   const handleComplete = () => {
     markComplete(mod.slug);

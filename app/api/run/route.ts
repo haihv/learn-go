@@ -9,6 +9,11 @@ const ipTimestamps = new Map<string, number[]>();
 
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
+  // Evict IPs whose window has fully expired so the map can't grow
+  // unboundedly with one-off clients.
+  for (const [key, stamps] of ipTimestamps) {
+    if (stamps.every((t) => now - t >= WINDOW_MS)) ipTimestamps.delete(key);
+  }
   const timestamps = (ipTimestamps.get(ip) ?? []).filter(
     (t) => now - t < WINDOW_MS
   );

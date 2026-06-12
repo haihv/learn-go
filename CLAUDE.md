@@ -9,9 +9,9 @@ Self-hosted interactive Go learning platform modeled after freeCodeCamp Python v
 ## Commands
 
 ```bash
-npm run dev          # start dev server (localhost:3000)
-npm run build        # production build
-npm run lint         # ESLint
+pnpm dev          # start dev server (localhost:3000)
+pnpm build        # production build
+pnpm lint         # ESLint
 npx tsc --noEmit     # type-check without emitting (run this after every phase)
 ```
 
@@ -52,7 +52,7 @@ store/course.ts                    ← Zustand store, persists to localStorage
 
 ### Go Playground proxy
 
-`POST /api/run` (Next.js Route Handler) proxies to `https://go.dev/play/p/run` with a 10 s `AbortController` timeout. Returns `RunResult { stdout, stderr, error, timedOut }`. Never call the Playground directly from the client.
+`POST /api/run` (Next.js Route Handler) proxies to `https://play.golang.org/compile?output=json` with a 10 s `AbortController` timeout. Returns `RunResult { stdout, stderr, error, timedOut }`. Never call the Playground directly from the client.
 
 ### CodeMirror SSR
 
