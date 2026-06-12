@@ -1,27 +1,72 @@
 @import "tailwindcss";
 
 @theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-space-mono), ui-monospace, monospace;
 
-  /* Navy palette — backgrounds and borders */
-  --color-navy-950: #060e1d;
-  --color-navy-900: #080f1e;
-  --color-navy-800: #0f172a;
-  --color-navy-700: #1e293b;
-  --color-navy-600: #334155;
-  --color-navy-500: #475569;
+  /* Navy palette — backgrounds and borders, dark indigo ramp with
+     distinct steps so panels, cards and hovers read as separate layers */
+  --color-navy-950: #080d1a;
+  --color-navy-900: #0d1424;
+  --color-navy-800: #141e33;
+  --color-navy-700: #20304f;
+  --color-navy-600: #31436a;
+  --color-navy-500: #6b7a99;
 
   /* Go brand palette — accents */
-  --color-go-cyan: #00d2a0;
-  --color-go-blue: #00b4d8;
-  --color-go-purple: #f0abfc;
-  --color-go-green: #86efac;
-  --color-go-red: #fca5a5;
+  --color-go-cyan: #2be8c8;
+  --color-go-blue: #38bdf8;
+  --color-go-purple: #c084fc;
+  --color-go-green: #4ade80;
+  --color-go-red: #fb7185;
   --color-go-yellow: #fbbf24;
 }
 
 body {
   background-color: var(--color-navy-950);
   color: #e2e8f0;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background-color: color-mix(in srgb, var(--color-go-cyan) 30%, transparent);
+  color: #f8fafc;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-go-cyan);
+  outline-offset: 2px;
+}
+
+/* Slim scrollbars that blend with the navy surfaces */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-navy-600) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--color-navy-600);
+  border-radius: 4px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-navy-500);
+}
+
+/* Soft radial accent glows for the landing hero */
+.hero-glow {
+  background:
+    radial-gradient(
+      ellipse 50% 40% at 30% 20%,
+      color-mix(in srgb, var(--color-go-cyan) 9%, transparent),
+      transparent
+    ),
+    radial-gradient(
+      ellipse 50% 40% at 75% 70%,
+      color-mix(in srgb, var(--color-go-blue) 8%, transparent),
+      transparent
+    ),
+    var(--color-navy-950);
 }

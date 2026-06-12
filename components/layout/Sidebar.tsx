@@ -50,7 +50,7 @@ function SidebarContent({ modules, currentSlug, completedCount, totalCount, isCo
           <button
             key={m.id}
             ref={m.slug === currentSlug ? activeRef : null}
-            className={`w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-navy-700 transition-colors cursor-pointer${m.slug === currentSlug ? " bg-navy-700" : ""}`}
+            className={`w-full text-left px-4 py-3 flex items-center gap-3 border-l-2 hover:bg-navy-700 transition-colors cursor-pointer ${m.slug === currentSlug ? "bg-navy-700 border-go-cyan" : "border-transparent"}`}
             onClick={() => onNavigate(m.slug)}
           >
             <span className="w-6 text-center">
