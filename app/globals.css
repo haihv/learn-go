@@ -1,27 +1,138 @@
 @import "tailwindcss";
 
+/* Two palettes behind one set of tokens. Custom CSS below must use the
+   --th-* variables directly: @theme inline tokens are inlined into
+   utility classes and never exist as runtime CSS variables. */
+:root {
+  color-scheme: light;
+
+  /* Paper surfaces — 950 page, 900 panels, 800 cards, 700 hover,
+     600 borders, 500 muted text */
+  --th-navy-950: #f4f1e8;
+  --th-navy-900: #ece8db;
+  --th-navy-800: #fdfcf7;
+  --th-navy-700: #e4decb;
+  --th-navy-600: #d6cfba;
+  --th-navy-500: #8c8472;
+
+  /* Ink-strength accents; translucent usages become pastel chips */
+  --th-go-cyan: #0c7a68;
+  --th-go-blue: #2767a8;
+  --th-go-purple: #7c5cb0;
+  --th-go-green: #3e7d4f;
+  --th-go-red: #c2402e;
+  --th-go-yellow: #a16207;
+
+  /* Ink scale — strongest text down to faintest, plus the inverse (50)
+     for text sitting on solid-ink elements like the CTA pill */
+  --th-ink-900: #1c1917;
+  --th-ink-800: #292524;
+  --th-ink-700: #3f3b36;
+  --th-ink-600: #57534e;
+  --th-ink-500: #78716c;
+  --th-ink-400: #a8a29e;
+  --th-ink-50: #fafaf9;
+
+  --th-body-text: #292524;
+  --th-dot: color-mix(in srgb, #d6cfba 55%, transparent);
+}
+
+.dark {
+  color-scheme: dark;
+
+  /* The same paper at night — warm charcoal surfaces instead of a cool
+     navy, so light and dark read as one design */
+  --th-navy-950: #151311;
+  --th-navy-900: #1d1a17;
+  --th-navy-800: #26221e;
+  --th-navy-700: #332d27;
+  --th-navy-600: #463e35;
+  --th-navy-500: #968b7b;
+
+  /* Muted, candlelit versions of the light theme's ink accents */
+  --th-go-cyan: #5fc9af;
+  --th-go-blue: #7fabd6;
+  --th-go-purple: #b49bd9;
+  --th-go-green: #8fc79a;
+  --th-go-red: #e0796a;
+  --th-go-yellow: #d9a440;
+
+  /* Cream ink on dark paper */
+  --th-ink-900: #f0ebe0;
+  --th-ink-800: #ded6c7;
+  --th-ink-700: #c6bdac;
+  --th-ink-600: #aaa191;
+  --th-ink-500: #8a8173;
+  --th-ink-400: #6b6358;
+  --th-ink-50: #1d1a17;
+
+  --th-body-text: #d8d0c1;
+  --th-dot: color-mix(in srgb, #463e35 45%, transparent);
+}
+
 @theme inline {
+  --font-sans: var(--font-space-mono), ui-monospace, monospace;
+  --font-serif: var(--font-source-serif), Georgia, serif;
   --font-mono: var(--font-space-mono), ui-monospace, monospace;
 
-  /* Navy palette — backgrounds and borders */
-  --color-navy-950: #060e1d;
-  --color-navy-900: #080f1e;
-  --color-navy-800: #0f172a;
-  --color-navy-700: #1e293b;
-  --color-navy-600: #334155;
-  --color-navy-500: #475569;
+  --color-navy-950: var(--th-navy-950);
+  --color-navy-900: var(--th-navy-900);
+  --color-navy-800: var(--th-navy-800);
+  --color-navy-700: var(--th-navy-700);
+  --color-navy-600: var(--th-navy-600);
+  --color-navy-500: var(--th-navy-500);
 
-  /* Go brand palette — accents */
-  --color-go-cyan: #00d2a0;
-  --color-go-blue: #00b4d8;
-  --color-go-purple: #f0abfc;
-  --color-go-green: #86efac;
-  --color-go-red: #fca5a5;
-  --color-go-yellow: #fbbf24;
+  --color-go-cyan: var(--th-go-cyan);
+  --color-go-blue: var(--th-go-blue);
+  --color-go-purple: var(--th-go-purple);
+  --color-go-green: var(--th-go-green);
+  --color-go-red: var(--th-go-red);
+  --color-go-yellow: var(--th-go-yellow);
+
+  /* The stone scale is used for ink text/surfaces in JSX — remap the
+     steps in use so they flip with the theme */
+  --color-stone-900: var(--th-ink-900);
+  --color-stone-800: var(--th-ink-800);
+  --color-stone-700: var(--th-ink-700);
+  --color-stone-600: var(--th-ink-600);
+  --color-stone-500: var(--th-ink-500);
+  --color-stone-400: var(--th-ink-400);
+  --color-stone-50: var(--th-ink-50);
 }
 
 body {
-  background-color: var(--color-navy-950);
-  color: #e2e8f0;
-  font-family: var(--font-mono);
+  background-color: var(--th-navy-950);
+  /* Subtle dotted grid, the texture of graph paper */
+  background-image: radial-gradient(var(--th-dot) 1px, transparent 1px);
+  background-size: 22px 22px;
+  color: var(--th-body-text);
+  /* Reference the next/font variable directly (see note at top) */
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+}
+
+::selection {
+  background-color: color-mix(in srgb, var(--th-go-cyan) 25%, transparent);
+  color: var(--th-ink-900);
+}
+
+:focus-visible {
+  outline: 2px solid var(--th-go-cyan);
+  outline-offset: 2px;
+}
+
+/* Slim scrollbars that blend with the surfaces */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--th-navy-600) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--th-navy-600);
+  border-radius: 4px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--th-navy-500);
 }
