@@ -40,30 +40,34 @@
 .dark {
   color-scheme: dark;
 
-  --th-navy-950: #080d1a;
-  --th-navy-900: #0d1424;
-  --th-navy-800: #141e33;
-  --th-navy-700: #20304f;
-  --th-navy-600: #31436a;
-  --th-navy-500: #6b7a99;
+  /* The same paper at night — warm charcoal surfaces instead of a cool
+     navy, so light and dark read as one design */
+  --th-navy-950: #151311;
+  --th-navy-900: #1d1a17;
+  --th-navy-800: #26221e;
+  --th-navy-700: #332d27;
+  --th-navy-600: #463e35;
+  --th-navy-500: #968b7b;
 
-  --th-go-cyan: #2be8c8;
-  --th-go-blue: #38bdf8;
-  --th-go-purple: #c084fc;
-  --th-go-green: #4ade80;
-  --th-go-red: #fb7185;
-  --th-go-yellow: #fbbf24;
+  /* Muted, candlelit versions of the light theme's ink accents */
+  --th-go-cyan: #5fc9af;
+  --th-go-blue: #7fabd6;
+  --th-go-purple: #b49bd9;
+  --th-go-green: #8fc79a;
+  --th-go-red: #e0796a;
+  --th-go-yellow: #d9a440;
 
-  --th-ink-900: #f2f1ef;
-  --th-ink-800: #e2e0dc;
-  --th-ink-700: #cfccc5;
-  --th-ink-600: #aab3c5;
-  --th-ink-500: #8593ad;
-  --th-ink-400: #67738c;
-  --th-ink-50: #0d1424;
+  /* Cream ink on dark paper */
+  --th-ink-900: #f0ebe0;
+  --th-ink-800: #ded6c7;
+  --th-ink-700: #c6bdac;
+  --th-ink-600: #aaa191;
+  --th-ink-500: #8a8173;
+  --th-ink-400: #6b6358;
+  --th-ink-50: #1d1a17;
 
-  --th-body-text: #dfe3ec;
-  --th-dot: color-mix(in srgb, #31436a 40%, transparent);
+  --th-body-text: #d8d0c1;
+  --th-dot: color-mix(in srgb, #463e35 45%, transparent);
 }
 
 @theme inline {
