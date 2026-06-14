@@ -35,6 +35,37 @@ export default function AtlasPage() {
           </div>
         </header>
 
+        {/* Tier 1 — Orient: the fast, shallow artifacts before the deep stems */}
+        <section className="mb-12">
+          <h2 className="text-lg font-bold font-serif text-stone-900 mb-4">Orient first</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <Link
+              href="/stack"
+              className="rounded-xl border border-navy-600 bg-navy-800 p-5 hover:border-go-cyan transition-colors"
+            >
+              <span className="text-3xl">🧱</span>
+              <h3 className="text-stone-900 font-bold font-serif mt-2">Stack Map</h3>
+              <p className="text-stone-500 text-sm mt-1">The Go toolchain, layer by layer — one dated pick each.</p>
+            </Link>
+            <Link
+              href="/plan"
+              className="rounded-xl border border-navy-600 bg-navy-800 p-5 hover:border-go-cyan transition-colors"
+            >
+              <span className="text-3xl">🗓</span>
+              <h3 className="text-stone-900 font-bold font-serif mt-2">The Plan</h3>
+              <p className="text-stone-500 text-sm mt-1">Six time-boxed weeks from fundamentals to a shipped service.</p>
+            </Link>
+            <Link
+              href="/deck"
+              className="rounded-xl border border-navy-600 bg-navy-800 p-5 hover:border-go-cyan transition-colors"
+            >
+              <span className="text-3xl">🃏</span>
+              <h3 className="text-stone-900 font-bold font-serif mt-2">Recall Deck</h3>
+              <p className="text-stone-500 text-sm mt-1">Spaced-repetition flashcards — the daily hook.</p>
+            </Link>
+          </div>
+        </section>
+
         {/* The Bloom ladder explained */}
         <section className="mb-12">
           <h2 className="text-lg font-bold font-serif text-stone-900 mb-4">The ladder every stem climbs</h2>
