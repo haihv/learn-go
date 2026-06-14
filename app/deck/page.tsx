@@ -4,8 +4,14 @@ import RecallDeck from "@/components/orient/RecallDeck";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 
 export const metadata: Metadata = {
-  title: "The Recall Deck — Learn Go",
+  title: "The Recall Deck",
   description: "Spaced-repetition flashcards for Go's durable facts — the daily hook.",
+  alternates: { canonical: "/deck" },
+  openGraph: {
+    title: "The Recall Deck — Learn Go",
+    description: "Spaced-repetition flashcards for Go's durable facts — the daily hook.",
+    url: "/deck",
+  },
 };
 
 // Tier 1 — the Recall Deck. Spaced repetition is the daily return hook; the
