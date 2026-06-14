@@ -50,6 +50,25 @@ store/course.ts                    ← Zustand store, persists to localStorage
 
 `CourseModule = LessonModule | WorkshopModule | LabModule` (discriminated union on `type` field). Always switch/narrow on `module.type` before passing to a view component.
 
+### T-shaped / Bloom deep-stems (additive track)
+
+A second, content-agnostic track sits alongside the lesson/workshop/lab curriculum, applying the T-shaped, Bloom-laddered method (teach the field broad-and-shallow via an Atlas, then drive deep stems down into each domain).
+
+```
+lib/stems/types.ts        ← Stem + Atlas types; 6 Bloom levels as a union
+lib/stems/atlas.ts        ← the "one idea" + Go carved into 8 domains
+lib/stems/<domain>.ts     ← one Stem per file (pure data, no React)
+lib/stems/index.ts        ← stems[] registry + atlas, getStemBySlug
+                                     ↓
+app/atlas/page.tsx         ← Tier 0 map: one idea, ladder, domain cards
+app/stem/[slug]/page.tsx   ← resolves slug → Stem (SSG via generateStaticParams)
+                                     ↓
+components/stem/StemShell.tsx       ← header + Bloom progress + prev/next rails
+components/stem/levels/*.tsx        ← one component per Bloom level (L1–L6)
+```
+
+A deep stem climbs Remember→Understand→Apply→Analyze→Evaluate→Create, one interaction shape per level. Authoring a new stem = write one data file in `lib/stems/`, register it in `index.ts`, and set the matching Atlas domain's `stemSlug`. No new React. `BLOOM_META` in `types.ts` holds **literal** Tailwind class names (e.g. `bg-go-cyan`) — never build color classes by string interpolation, the v4 scanner won't see them. Stem progress persists via the store's `reachStemLevel` / `stemLevels`.
+
 ### Go Playground proxy
 
 `POST /api/run` (Next.js Route Handler) proxies to `https://play.golang.org/compile?output=json` with a 10 s `AbortController` timeout. Returns `RunResult { stdout, stderr, error, timedOut }`. Never call the Playground directly from the client.

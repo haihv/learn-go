@@ -17,12 +17,23 @@ export default function HomePage() {
         <p className="text-stone-600 text-lg max-w-xl mx-auto mb-10">
           Master Go through lessons, hands-on workshops, and coding labs — <strong>no setup required</strong>.
         </p>
-        <Link
-          href="/learn/intro"
-          className="bg-stone-900 text-stone-50 font-bold font-mono px-8 py-3 rounded-full text-lg shadow-md hover:bg-stone-700 hover:shadow-lg transition"
-        >
-          Get Started →
-        </Link>
+        <div className="flex flex-col sm:flex-row items-center gap-3">
+          <Link
+            href="/learn/intro"
+            className="bg-stone-900 text-stone-50 font-bold font-mono px-8 py-3 rounded-full text-lg shadow-md hover:bg-stone-700 hover:shadow-lg transition"
+          >
+            Get Started →
+          </Link>
+          <Link
+            href="/atlas"
+            className="border border-go-cyan text-go-cyan font-bold font-mono px-8 py-3 rounded-full text-lg hover:bg-go-cyan/10 transition-colors"
+          >
+            🗺 Explore the Atlas
+          </Link>
+        </div>
+        <p className="text-stone-500 text-xs mt-5 max-w-md">
+          New: a T-shaped map with Bloom-laddered deep stems — learn the whole field, then dig deep.
+        </p>
       </section>
 
       <section className="py-20 px-4 bg-navy-900">
