@@ -5,8 +5,14 @@ import { getStemBySlug } from "@/lib/stems";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 
 export const metadata: Metadata = {
-  title: "The Plan — Learn Go",
+  title: "The Plan",
   description: "A time-boxed, week-by-week path from Go fundamentals to a shipped service.",
+  alternates: { canonical: "/plan" },
+  openGraph: {
+    title: "The Plan — Learn Go",
+    description: "A time-boxed, week-by-week path from Go fundamentals to a shipped service.",
+    url: "/plan",
+  },
 };
 
 // Tier 1 — the Plan. A time-boxed path to a concrete goal; each week ends in a

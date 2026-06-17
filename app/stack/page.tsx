@@ -4,8 +4,14 @@ import { stackMap } from "@/lib/orient";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 
 export const metadata: Metadata = {
-  title: "The Stack Map — Learn Go",
+  title: "The Stack Map",
   description: "The Go toolchain layer by layer, with one dated current-best pick each.",
+  alternates: { canonical: "/stack" },
+  openGraph: {
+    title: "The Stack Map — Learn Go",
+    description: "The Go toolchain layer by layer, with one dated current-best pick each.",
+    url: "/stack",
+  },
 };
 
 // Tier 1 — the Stack Map. Concepts are durable, tools are swappable: each pick

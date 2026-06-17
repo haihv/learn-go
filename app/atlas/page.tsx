@@ -4,9 +4,16 @@ import { atlas, BLOOM_META } from "@/lib/stems";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 
 export const metadata: Metadata = {
-  title: "The Atlas — Learn Go",
+  title: "The Atlas",
   description:
     "A T-shaped map of Go: the one idea, the domains, and the Bloom ladder each deep stem climbs.",
+  alternates: { canonical: "/atlas" },
+  openGraph: {
+    title: "The Atlas — Learn Go",
+    description:
+      "A T-shaped map of Go: the one idea, the domains, and the Bloom ladder each deep stem climbs.",
+    url: "/atlas",
+  },
 };
 
 // Tier 0 of the method — the Atlas. The map of the field, where to focus, and
