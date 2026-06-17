@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Source_Serif_4, Space_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { SITE_URL, SITE_NAME, SITE_SHORT, SITE_DESCRIPTION, BRAND } from "@/lib/seo";
 import "./globals.css";
 
@@ -76,7 +77,10 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
       </head>
-      <body className={`${sourceSerif.variable} ${spaceMono.variable} antialiased`}>{children}</body>
+      <body className={`${sourceSerif.variable} ${spaceMono.variable} antialiased`}>
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }
