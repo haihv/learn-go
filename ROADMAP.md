@@ -10,7 +10,7 @@
 
 ## Next Up
 
-- [ ] **Go WASM** — run entirely in browser, zero latency
+- [x] **Go WASM** — run entirely in browser, zero latency (Yaegi → wasm in a Web Worker, Playground fallback)
 - [x] **Search** — full-text search across curriculum (⌘K palette, client-side BM25 index)
 
 ## Later

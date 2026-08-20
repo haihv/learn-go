@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import type { EnginePreference } from "@/lib/go-runner";
 
 type CourseState = {
   completedSlugs: string[];
@@ -12,11 +13,14 @@ type CourseState = {
   stemLevels: Record<string, number>;
   // Recall Deck schedule: card id → next-due epoch ms + current interval (days)
   deckSchedule: Record<string, { due: number; interval: number }>;
+  // Where Go code runs: "auto" = in-browser wasm runtime when possible
+  enginePreference: EnginePreference;
   markComplete: (slug: string) => void;
   setWorkshopStep: (slug: string, step: number) => void;
   saveStepSolution: (slug: string, step: number, code: string) => void;
   reachStemLevel: (slug: string, level: number) => void;
   reviewCard: (id: string, grade: "again" | "fuzzy" | "good") => void;
+  setEnginePreference: (pref: EnginePreference) => void;
 };
 
 const DAY_MS = 86_400_000;
@@ -29,6 +33,7 @@ export const useCourseStore = create<CourseState>()(
       workshopSolutions: {},
       stemLevels: {},
       deckSchedule: {},
+      enginePreference: "auto",
       markComplete: (slug) =>
         set((state) => ({
           completedSlugs: state.completedSlugs.includes(slug)
@@ -53,6 +58,7 @@ export const useCourseStore = create<CourseState>()(
             [slug]: Math.max(state.stemLevels[slug] ?? 0, level),
           },
         })),
+      setEnginePreference: (pref) => set({ enginePreference: pref }),
       // Spaced repetition: ×2.5 the interval on a confident recall, reset to
       // tomorrow on a fuzzy one, and re-show this session on a miss.
       reviewCard: (id, grade) =>

@@ -9,7 +9,8 @@ const securityHeaders = [
     // unsafe-inline required for Tailwind CSS and CodeMirror inline styles
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline'",
+      // wasm-unsafe-eval: the in-browser Go runtime (public/wasm) must compile
+      "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'",
       "style-src 'self' 'unsafe-inline'",
       "connect-src 'self' https://play.golang.org",
       "img-src 'self' data:",

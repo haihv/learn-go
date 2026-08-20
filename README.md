@@ -5,7 +5,7 @@ An interactive Go learning platform built with Next.js. Work through lessons, wo
 ## Features
 
 - Structured curriculum with lessons, workshops (guided exercises), and labs (open-ended challenges)
-- In-browser Go execution via the [Go Playground](https://go.dev/play) API (proxied server-side)
+- Go runs **in your browser** — the [Yaegi](https://github.com/traefik/yaegi) interpreter compiled to WebAssembly executes programs in a Web Worker with zero network latency; programs that need `testing`, `os/exec`, `database/sql`, non-stdlib imports, or that the interpreter can't handle fall back transparently to the [Go Playground](https://go.dev/play) API (proxied server-side)
 - Progress tracked locally in `localStorage`
 - Full-text search across every lesson, workshop, lab, and deep stem — press `⌘K` / `Ctrl+K` anywhere
 - Syntax highlighting with CodeMirror 6
@@ -32,9 +32,12 @@ Or visit the live site at [learn-go.haihv.dev](https://learn-go.haihv.dev).
 
 ```bash
 pnpm dev      # development server
-pnpm build    # production build
+pnpm wasm     # build the in-browser Go runtime into public/wasm/ (needs Go, or downloads a pinned toolchain)
+pnpm build    # pnpm wasm + production build
 pnpm lint     # ESLint
 ```
+
+The wasm runtime (`public/wasm/yaegi.wasm`, ~40 MB raw / ~8 MB compressed) is gitignored and built by `scripts/wasm/build.sh` — locally with your `go`, on Vercel by downloading the pinned Go version. Run `pnpm wasm` once before `pnpm dev` if you want the in-browser engine in development; without it the app simply uses the Playground.
 
 ## Built with
 

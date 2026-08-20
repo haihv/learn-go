@@ -19,9 +19,10 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "pnpm wasm && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "wasm": "bash scripts/wasm/build.sh"
   },
   "dependencies": {
     "@codemirror/commands": "^6.10.3",
