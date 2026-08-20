@@ -2,6 +2,7 @@
 import { useShortcutKey } from "@/hooks/useShortcutKey";
 import Badge from "@/components/ui/Badge";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import SearchButton from "@/components/search/SearchButton";
 import type { CourseModule } from "@/lib/curriculum/types";
 
 type TopBarProps = {
@@ -98,6 +99,7 @@ export default function TopBar({
           <span className="text-go-cyan text-sm font-bold">Course Complete! 🎉</span>
         )}
 
+        <SearchButton variant="icon" className="ml-1" />
         <ThemeToggle className="ml-1" />
       </div>
     </div>

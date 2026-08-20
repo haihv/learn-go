@@ -69,6 +69,10 @@ components/stem/levels/*.tsx        ← one component per Bloom level (L1–L6)
 
 A deep stem climbs Remember→Understand→Apply→Analyze→Evaluate→Create, one interaction shape per level. Authoring a new stem = write one data file in `lib/stems/`, register it in `index.ts`, and set the matching Atlas domain's `stemSlug`. No new React. `BLOOM_META` in `types.ts` holds **literal** Tailwind class names (e.g. `bg-go-cyan`) — never build color classes by string interpolation, the v4 scanner won't see them. Stem progress persists via the store's `reachStemLevel` / `stemLevels`.
 
+### Search
+
+Client-side full-text search, zero runtime deps. `lib/search/documents.ts` flattens curriculum modules, stems, and atlas domains into `SearchDoc[]` (markdown stripped); `lib/search/engine.ts` is a small BM25 inverted index with title boost, prefix expansion of the last (partial) term, and snippet extraction; `lib/search/index.ts` exposes `searchCurriculum(query)` over a lazily built singleton index. The ⌘K/Ctrl+K palette (`components/search/SearchPalette.tsx`) is mounted once in `app/layout.tsx`; `SearchButton` triggers live in the Sidebar, TopBar, and landing page and all talk to `store/search.ts` (non-persisted Zustand `open` flag). New searchable content types go in `documents.ts` only.
+
 ### Go Playground proxy
 
 `POST /api/run` (Next.js Route Handler) proxies to `https://play.golang.org/compile?output=json` with a 10 s `AbortController` timeout. Returns `RunResult { stdout, stderr, error, timedOut }`. Never call the Playground directly from the client.

@@ -11,7 +11,7 @@
 ## Next Up
 
 - [ ] **Go WASM** — run entirely in browser, zero latency
-- [ ] **Search** — full-text search across curriculum
+- [x] **Search** — full-text search across curriculum (⌘K palette, client-side BM25 index)
 
 ## Later
 

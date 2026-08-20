@@ -7,6 +7,7 @@ An interactive Go learning platform built with Next.js. Work through lessons, wo
 - Structured curriculum with lessons, workshops (guided exercises), and labs (open-ended challenges)
 - In-browser Go execution via the [Go Playground](https://go.dev/play) API (proxied server-side)
 - Progress tracked locally in `localStorage`
+- Full-text search across every lesson, workshop, lab, and deep stem — press `⌘K` / `Ctrl+K` anywhere
 - Syntax highlighting with CodeMirror 6
 
 ## Getting Started

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useProgress } from "@/hooks/useProgress";
 import ProgressBar from "@/components/ui/ProgressBar";
 import Badge from "@/components/ui/Badge";
+import SearchButton from "@/components/search/SearchButton";
 import type { CourseModule } from "@/lib/curriculum/types";
 
 type SidebarProps = {
@@ -44,6 +45,7 @@ function SidebarContent({ modules, currentSlug, completedCount, totalCount, isCo
           </button>
         </div>
         <ProgressBar completed={completedCount} total={totalCount} />
+        <SearchButton className="mt-3" />
       </div>
       <div className="flex-1 overflow-y-auto py-2">
         {modules.map((m) => (
