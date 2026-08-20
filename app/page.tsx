@@ -2,6 +2,7 @@ import Link from "next/link";
 import { curriculum } from "@/lib/curriculum";
 import Badge from "@/components/ui/Badge";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import SearchButton from "@/components/search/SearchButton";
 import JsonLd from "@/components/seo/JsonLd";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
 
@@ -33,6 +34,7 @@ export default function HomePage() {
   return (
     <main>
       <JsonLd data={courseJsonLd} />
+      <SearchButton variant="icon" className="fixed top-4 right-14 z-50" />
       <ThemeToggle className="fixed top-4 right-4 z-50" />
       <section className="min-h-screen flex flex-col items-center justify-center text-center px-4">
         <p className="text-go-cyan text-sm font-mono mb-6 border border-navy-600 rounded-full px-4 py-1.5 bg-navy-800">
