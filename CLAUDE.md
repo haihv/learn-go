@@ -10,7 +10,8 @@ Self-hosted interactive Go learning platform modeled after freeCodeCamp Python v
 
 ```bash
 pnpm dev          # start dev server (localhost:3000)
-pnpm build        # production build
+pnpm wasm         # build the in-browser Go runtime → public/wasm/ (gitignored)
+pnpm build        # pnpm wasm + production build
 pnpm lint         # ESLint
 npx tsc --noEmit     # type-check without emitting (run this after every phase)
 ```
@@ -24,7 +25,7 @@ npx tsc --noEmit     # type-check without emitting (run this after every phase)
 | Framework | Next.js 16 / React 19 (App Router) |
 | Styling | Tailwind CSS v4 with custom navy/go color tokens |
 | Code editor | CodeMirror 6 via `@uiw/react-codemirror` |
-| Go execution | Go Playground REST API (proxied via `/api/run`) |
+| Go execution | In-browser: Yaegi interpreter → wasm in a Web Worker; fallback: Go Playground REST API (proxied via `/api/run`) |
 | State | Zustand + `persist` middleware → localStorage |
 
 ## Architecture
@@ -41,7 +42,9 @@ app/learn/[moduleId]/page.tsx  ← server component, resolves slug → module
 components/{lesson,workshop,lab}/  ← client components per activity type
                                      ↓
 components/editor/GoEditor.tsx     ← CodeMirror, browser-only
-lib/go-runner.ts                   ← POSTs to /api/run, parses result
+lib/go-runner.ts                   ← picks an engine (wasm → Playground fallback), normalises RunResult
+lib/wasm/engine.ts                 ← main-thread handle to the wasm worker (lazy load, timeout → respawn)
+lib/wasm/worker.ts                 ← Web Worker: loads public/wasm/{wasm_exec.js,yaegi.wasm}, runs programs
 lib/test-runner.ts                 ← evaluates LabTest[] against code + stdout
 store/course.ts                    ← Zustand store, persists to localStorage
 ```
@@ -73,9 +76,13 @@ A deep stem climbs Remember→Understand→Apply→Analyze→Evaluate→Create, 
 
 Client-side full-text search, zero runtime deps. `lib/search/documents.ts` flattens curriculum modules, stems, and atlas domains into `SearchDoc[]` (markdown stripped); `lib/search/engine.ts` is a small BM25 inverted index with title boost, prefix expansion of the last (partial) term, and snippet extraction; `lib/search/index.ts` exposes `searchCurriculum(query)` over a lazily built singleton index. The ⌘K/Ctrl+K palette (`components/search/SearchPalette.tsx`) is mounted once in `app/layout.tsx`; `SearchButton` triggers live in the Sidebar, TopBar, and landing page and all talk to `store/search.ts` (non-persisted Zustand `open` flag). New searchable content types go in `documents.ts` only.
 
-### Go Playground proxy
+### Go execution engines
 
-`POST /api/run` (Next.js Route Handler) proxies to `https://play.golang.org/compile?output=json` with a 10 s `AbortController` timeout. Returns `RunResult { stdout, stderr, error, timedOut }`. Never call the Playground directly from the client.
+`runGoCode(code, { engine })` in `lib/go-runner.ts` is the only entry point views call. Engine preference lives in the store (`enginePreference: "auto" | "playground"`, toggled by `components/editor/EngineBadge.tsx`). In `auto` mode the order is: (1) `browserRuntimeBlocker(code)` — denylisted imports (`testing`, `os/exec`, `database/sql`, …), any non-stdlib import, or `func TestX(t *testing.T)` ⇒ Playground; (2) wasm not `ready` yet ⇒ Playground now, wasm download kicked off for next time; (3) run in wasm — keep the result unless the interpreter returned a non-parser error (Yaegi has gaps: some generic inference, `errors.As` with `**T`), in which case re-run on the Playground, which is authoritative. `RunResult.engine` / `fallbackReason` are shown under the output panel.
+
+**wasm runtime:** `scripts/wasm/main.go` wraps Yaegi (`interp` + `stdlib` symbols) and exposes `__goRun(code, cb)`; `scripts/wasm/build.sh` builds it to `public/wasm/yaegi.wasm` + copies the matching `wasm_exec.js` (gitignored, produced by `pnpm wasm`/`pnpm build`; downloads a pinned Go if none is installed — `vercel.json` pins the build command to `pnpm build`). `lib/wasm/engine.ts` is a singleton (`wasmEngine`) that boots one worker lazily, resolves runs by id, and on a 10 s timeout terminates + respawns the worker (the only way to stop a runaway Go program). The CSP needs `'wasm-unsafe-eval'` in `script-src`. A fresh interpreter is created per run so globals/goroutines never leak between programs. Yaegi's single `Eval` of a `package main` file already runs `main()`.
+
+**Playground proxy:** `POST /api/run` (Next.js Route Handler) proxies to `https://play.golang.org/compile?output=json` with a 10 s `AbortController` timeout. Returns `RunResult { stdout, stderr, error, timedOut }`. Never call the Playground directly from the client.
 
 ### CodeMirror SSR
 
@@ -88,7 +95,8 @@ const GoEditor = dynamic(() => import("@/components/editor/GoEditor"), { ssr: fa
 
 ```ts
 { completedSlugs: string[], workshopSteps: Record<string, number>,
-  markComplete(slug), setWorkshopStep(slug, step) }
+  enginePreference: "auto" | "playground",
+  markComplete(slug), setWorkshopStep(slug, step), setEnginePreference(pref) }
 ```
 Persisted under localStorage key `"go-course-progress"`.
 

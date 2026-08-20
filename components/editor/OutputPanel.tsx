@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import type { Engine } from "@/lib/go-runner";
 
 type Tab = "output" | "errors";
 
@@ -8,9 +9,11 @@ type OutputPanelProps = {
   stderr: string;
   error: string | null;
   defaultTab?: Tab;
+  engine?: Engine;
+  fallbackReason?: string;
 };
 
-export default function OutputPanel({ stdout, stderr, error, defaultTab = "output" }: OutputPanelProps) {
+export default function OutputPanel({ stdout, stderr, error, defaultTab = "output", engine, fallbackReason }: OutputPanelProps) {
   const [activeTab, setActiveTab] = useState<Tab>(defaultTab);
 
   const errorsContent = [stderr, error].filter(Boolean).join("\n");
@@ -50,6 +53,13 @@ export default function OutputPanel({ stdout, stderr, error, defaultTab = "outpu
             <span className="text-navy-500">No errors</span>
           )}
         </pre>
+      )}
+
+      {engine && (
+        <p className="mt-1 text-[11px] text-navy-500 font-mono">
+          {engine === "wasm" ? "⚡ ran in your browser" : "☁ ran on the Go Playground"}
+          {fallbackReason ? ` · ${fallbackReason}` : ""}
+        </p>
       )}
     </div>
   );

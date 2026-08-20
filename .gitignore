@@ -46,3 +46,6 @@ next-env.d.ts
 
 # Windows
 Thumbs.db
+
+# in-browser Go runtime — built by scripts/wasm/build.sh during `pnpm build`
+/public/wasm/

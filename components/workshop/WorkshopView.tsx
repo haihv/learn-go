@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { useCourseStore } from "@/store/course";
 import { runGoCode } from "@/lib/go-runner";
+import EngineBadge from "@/components/editor/EngineBadge";
 import type { RunResult } from "@/lib/go-runner";
 import StepProgress from "@/components/workshop/StepProgress";
 import StepInstruction from "@/components/workshop/StepInstruction";
@@ -27,6 +28,7 @@ type Feedback = {
 export default function WorkshopView({ module, onComplete }: Props) {
   const setWorkshopStep = useCourseStore((state) => state.setWorkshopStep);
   const saveStepSolution = useCourseStore((state) => state.saveStepSolution);
+  const enginePreference = useCourseStore((state) => state.enginePreference);
   const markComplete = useCourseStore((state) => state.markComplete);
   const initialStep = useCourseStore((state) => state.workshopSteps[module.slug] ?? 0);
   const savedSolutions = useCourseStore((state) => state.workshopSolutions[module.slug]) ?? {};
@@ -86,7 +88,7 @@ export default function WorkshopView({ module, onComplete }: Props) {
     setFeedback(null);
     setReadyToAdvance(false);
 
-    const result = await runGoCode(code);
+    const result = await runGoCode(code, { engine: enginePreference });
     setRunResult(result);
     setRunCount((c) => c + 1);
 
@@ -166,6 +168,7 @@ export default function WorkshopView({ module, onComplete }: Props) {
             {isChecking ? "Running…" : "▶ Run & Check"}
           </button>
           <span className="text-navy-500 text-xs">{mod}+Enter to run</span>
+          <EngineBadge className="ml-auto" />
         </>
       )}
     </div>
@@ -202,6 +205,8 @@ export default function WorkshopView({ module, onComplete }: Props) {
                   stdout={runResult.stdout}
                   stderr={runResult.stderr}
                   error={runResult.error}
+                  engine={runResult.engine}
+                  fallbackReason={runResult.fallbackReason}
                   defaultTab={runResult.stderr || runResult.error ? "errors" : "output"}
                 />
               </div>
@@ -251,6 +256,8 @@ export default function WorkshopView({ module, onComplete }: Props) {
             stdout={runResult.stdout}
             stderr={runResult.stderr}
             error={runResult.error}
+            engine={runResult.engine}
+            fallbackReason={runResult.fallbackReason}
             defaultTab={runResult.stderr || runResult.error ? "errors" : "output"}
           />
         )}

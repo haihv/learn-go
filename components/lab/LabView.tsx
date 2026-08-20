@@ -2,6 +2,8 @@
 import dynamic from "next/dynamic";
 import { useState, useRef, useEffect } from "react";
 import { runGoCode } from "@/lib/go-runner";
+import EngineBadge from "@/components/editor/EngineBadge";
+import { useCourseStore } from "@/store/course";
 import type { RunResult } from "@/lib/go-runner";
 import { runLabTests, allPassed } from "@/lib/test-runner";
 import LabInstructions from "@/components/lab/LabInstructions";
@@ -27,6 +29,7 @@ export default function LabView({ module, onComplete }: Props) {
   const [showCelebration, setShowCelebration] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const enginePreference = useCourseStore((s) => s.enginePreference);
 
   // Resizable split — instructions width as % of the container
   const [splitPct, setSplitPct] = useState(40);
@@ -67,7 +70,7 @@ export default function LabView({ module, onComplete }: Props) {
     setIsRunning(true);
     setPassed(false);
 
-    const result = await runGoCode(code);
+    const result = await runGoCode(code, { engine: enginePreference });
     setRunResult(result);
     setRunCount((c) => c + 1);
 
@@ -120,6 +123,7 @@ export default function LabView({ module, onComplete }: Props) {
             ) : "▶ Run & Check"}
           </button>
           <span className="text-navy-500 text-xs">{mod}+Enter to run</span>
+          <EngineBadge className="ml-auto" />
         </>
       )}
     </div>
@@ -133,6 +137,8 @@ export default function LabView({ module, onComplete }: Props) {
           stdout={runResult.stdout}
           stderr={runResult.stderr}
           error={runResult.error}
+          engine={runResult.engine}
+          fallbackReason={runResult.fallbackReason}
           defaultTab={runResult.stderr || runResult.error ? "errors" : "output"}
         />
       )}
