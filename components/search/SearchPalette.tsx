@@ -267,6 +267,15 @@ function PaletteDialog({ onClose }: { onClose: () => void }) {
         <div className="flex items-center gap-4 border-t border-navy-600 px-4 py-2 text-[11px] text-navy-500">
           <span><kbd className="font-mono">↑↓</kbd> navigate</span>
           <span><kbd className="font-mono">↵</kbd> open</span>
+          {query.trim() && (
+            <button
+              type="button"
+              onClick={() => go(`/search?q=${encodeURIComponent(query.trim())}`)}
+              className="text-go-blue hover:underline cursor-pointer"
+            >
+              All results →
+            </button>
+          )}
           <span className="ml-auto"><kbd className="font-mono">{mod}K</kbd> toggle</span>
         </div>
       </div>

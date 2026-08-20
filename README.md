@@ -7,7 +7,7 @@ An interactive Go learning platform built with Next.js. Work through lessons, wo
 - Structured curriculum with lessons, workshops (guided exercises), and labs (open-ended challenges)
 - Go runs **in your browser** — the [Yaegi](https://github.com/traefik/yaegi) interpreter compiled to WebAssembly executes programs in a Web Worker with zero network latency; programs that need `testing`, `os/exec`, `database/sql`, non-stdlib imports, or that the interpreter can't handle fall back transparently to the [Go Playground](https://go.dev/play) API (proxied server-side)
 - Progress tracked locally in `localStorage`
-- Full-text search across every lesson, workshop, lab, and deep stem — press `⌘K` / `Ctrl+K` anywhere
+- Full-text search across every lesson, workshop, lab, and deep stem — press `⌘K` / `Ctrl+K` anywhere, or use `/search?q=…` for a shareable results page
 - Syntax highlighting with CodeMirror 6
 
 ## Getting Started

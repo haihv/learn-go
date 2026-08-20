@@ -74,7 +74,7 @@ A deep stem climbs Remember→Understand→Apply→Analyze→Evaluate→Create, 
 
 ### Search
 
-Client-side full-text search, zero runtime deps. `lib/search/documents.ts` flattens curriculum modules, stems, and atlas domains into `SearchDoc[]` (markdown stripped); `lib/search/engine.ts` is a small BM25 inverted index with title boost, prefix expansion of the last (partial) term, and snippet extraction; `lib/search/index.ts` exposes `searchCurriculum(query)` over a lazily built singleton index. The ⌘K/Ctrl+K palette (`components/search/SearchPalette.tsx`) is mounted once in `app/layout.tsx`; `SearchButton` triggers live in the Sidebar, TopBar, and landing page and all talk to `store/search.ts` (non-persisted Zustand `open` flag). New searchable content types go in `documents.ts` only.
+Client-side full-text search, zero runtime deps. `lib/search/documents.ts` flattens curriculum modules, stems, and atlas domains into `SearchDoc[]` (markdown stripped); `lib/search/engine.ts` is a small BM25 inverted index with title boost, prefix expansion of the last (partial) term, and snippet extraction; `lib/search/index.ts` exposes `searchCurriculum(query)` over a lazily built singleton index. The ⌘K/Ctrl+K palette (`components/search/SearchPalette.tsx`) is mounted once in `app/layout.tsx`; `SearchButton` triggers live in the Sidebar, TopBar, and landing page and all talk to `store/search.ts` (non-persisted Zustand `open` flag). `app/search/page.tsx` is the server-rendered twin (`/search?q=`, noindex) for shareable links and no-JS. New searchable content types go in `documents.ts` only.
 
 ### Go execution engines
 
